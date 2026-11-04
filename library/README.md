@@ -1,0 +1,21 @@
+# Происхождение библиотеки
+
+`content.json:name` является единственным редактируемым источником видимого имени. Стабильные `better-than-wolves` и `Better Than Wolves` задают ID и путь установки. Версии и mod ID читаются из закреплённых JAR. Nightmare Mode объявлен автором аддоном Better Than Wolves и требует именно CE 3.1.1 в официальном Modrinth version API; отношение `nightmare` → `btw` имеет игровое основание, а не только Java-зависимость.
+
+## Страницы проектов
+
+Better Than Wolves **Community Edition** является продолжением FlowerChild, а не одноимённым оригинальным проектом. Официальная страница этой версии: https://modrinth.com/mod/btwce, исходники https://github.com/BTW-Community/BTW-Public. Nightmare Mode 1.1.6 загружен с официального Modrinth проекта elmi2305, version `MiTHb6KB`, связанного с https://github.com/elmi2305/Nightmare-Mode-CE-3.x. Шаблонный `sources` внутри его JAR не используется вместо подтверждённого проекта.
+
+GrossFabricHacks `6.3-btw` встроен автором CE и ссылается на исходники Fabric-Transformer; GitHub официально перенаправляет этот старый адрес на `Ueaj-Kerman/GrossFabricHacks`, используемый в библиотеке. Самостоятельный опубликованный BTW-вариант вне CE не подтверждён: точный встроенный вариант воспроизводится из неизменённого CE JAR. Старые официальные `auoeke/reflect` и `auoeke/unsafe` перенаправляются на `nnym/reflect` и `nnym/unsafe`. Byte Buddy Agent, reflect/unsafe, Log4j API/Core и Typesafe Config являются вложенными библиотеками; ссылки ведут на собственные официальные исходники или сайт. Они не устанавливаются отдельно.
+
+`btw_lan_bridge` является собственным техническим компонентом этой поставки, когда он включён в активный lock. Самостоятельной страницы CurseForge/Modrinth нет; официальный источник находится в этом репозитории, `tools/legacy-bridge`. Это явное исключение для компонента без отдельной страницы. Общий e4steam поставляется лаунчером из отдельного репозитория и не включается в исходные моды или счётчик сборки.
+
+## Превью
+
+`preview.jpg` является неизменённым оригинальным JPEG **Nightmare Mode** из официальной галереи Modrinth проекта elmi2305: https://cdn.modrinth.com/data/Br97uX7n/images/30d22f7af6ace1da6b0f9edd008a8396085069b0.jpeg. SHA256 `c639f34d7e240728f4e50b0fc7731f8285bc3b431a0699ae069a5c4f276cfd0f`. Изображение иллюстрирует авторский контент, не является скриншотом QA этой поставки и не доказывает проверку конкретных механик.
+
+## Состав
+
+`library/loaded-mods.json` снят с окончательного production клиента `production-rename-09`, helper 1.0.0 SHA256 `814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172`. Все три исходных JAR побайтно совпали с реально запущенным составом. Loader зарегистрировал 15 записей; после исключения платформенных Minecraft/Java/Fabric Loader и управляемого транспорта e4steam библиотека содержит **11 фактически загруженных mod ID**, включая MixinExtras. `record_runtime_inventory.py` проверяет соответствие private ModList, actual JAR inventory и native mod origins, затем записывает только публичные mod/project данные и label. После изменения любого исходного или runtime-source JAR снимок отклоняется и снимается заново; статическое чтение metadata не выдаётся за фактический ModList.
+
+MixinExtras **включается** в технический список и общий счётчик, поскольку реально зарегистрирован загрузчиком. Он не выдаётся за отдельный JAR внутри `mods`: `library/runtime-sources.json` закрепляет официальный Fabric Loader 0.18.2, URL, размер 1,944,281 байт и SHA256 `3ab7f6b1732170394e77c9f31f8b598928f8766546f9849482431ddbd21f1acd`. Внутри него находится `META-INF/jars/mixinextras-fabric-0.5.0.jar`, SHA256 `5f3f1313f8b3683c370a63c447c3722c5bc35e9bd16ad32e860ad9c786a60749`, с реальным ID `mixinextras`, версией 0.5.0 и автором LlamaLad7. Подтверждённый официальный источник и releases находятся в GitHub `LlamaLad7/MixinExtras`; самостоятельные страницы именно этой библиотеки на CurseForge/Modrinth не подтверждены. Tooling cache находится в игнорируемом `artifacts/runtime-sources`, проверяется при генерации и связывается с actual snapshot через `runtimeSources`; в игровые payload он не входит. Сам `fabricloader` не добавляется в счётчик. Runtime origin проверяется отдельно от статического вложения и не предполагается выполненным только из-за наличия manifest.

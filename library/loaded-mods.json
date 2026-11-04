@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "minecraftVersion": "1.6.4",
+  "loader": {
+    "type": "legacyfabric",
+    "version": "0.18.2"
+  },
+  "sourceJars": {
+    "mods/btw-lan-bridge-1.0.0.jar": "814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172",
+    "mods/btwce-3.1.1.jar": "ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d",
+    "mods/Nightmare-Mode-1.1.6.jar": "be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248"
+  },
+  "runtimeSources": {
+    "artifacts/runtime-sources/fabric-loader-0.18.2.jar": "3ab7f6b1732170394e77c9f31f8b598928f8766546f9849482431ddbd21f1acd"
+  },
+  "mods": [
+    {
+      "id": "btw",
+      "name": "Better Than Wolves: Community Edition",
+      "version": "3.1.1"
+    },
+    {
+      "id": "btw_lan_bridge",
+      "name": "BTW Launcher Profile Bridge",
+      "version": "1.0.0"
+    },
+    {
+      "id": "com_typesafe_config",
+      "name": "config",
+      "version": "1.4.5"
+    },
+    {
+      "id": "grossfabrichacks",
+      "name": "GrossFabricHacks",
+      "version": "6.3-btw"
+    },
+    {
+      "id": "mixinextras",
+      "name": "MixinExtras",
+      "version": "0.5.0"
+    },
+    {
+      "id": "net_auoeke_reflect",
+      "name": "reflect",
+      "version": "6.3.0"
+    },
+    {
+      "id": "net_auoeke_unsafe",
+      "name": "unsafe",
+      "version": "1.7.3"
+    },
+    {
+      "id": "net_bytebuddy_byte-buddy-agent",
+      "name": "byte-buddy-agent",
+      "version": "1.17.7"
+    },
+    {
+      "id": "nightmare",
+      "name": "Nightmare Mode",
+      "version": "1.1.6"
+    },
+    {
+      "id": "org_apache_logging_log4j_log4j-api",
+      "name": "log4j-api",
+      "version": "2.19.0"
+    },
+    {
+      "id": "org_apache_logging_log4j_log4j-core",
+      "name": "log4j-core",
+      "version": "2.19.0"
+    }
+  ],
+  "capture": {
+    "evidenceLabel": "production-rename-09",
+    "actualLoaderRecords": 15,
+    "excludedPlatformAndManagedIds": {
+      "e4steam": "launcher-managed shared transport",
+      "fabricloader": "loader platform",
+      "java": "Java runtime",
+      "minecraft": "game platform"
+    },
+    "runtimeOriginProof": {
+      "mixinextras": {
+        "kind": "loader-embedded",
+        "containerSha256": "3ab7f6b1732170394e77c9f31f8b598928f8766546f9849482431ddbd21f1acd",
+        "entry": "META-INF/jars/mixinextras-fabric-0.5.0.jar",
+        "entrySha256": "5f3f1313f8b3683c370a63c447c3722c5bc35e9bd16ad32e860ad9c786a60749"
+      }
+    },
+    "runtimeVerdictIsSeparate": true
+  }
+}

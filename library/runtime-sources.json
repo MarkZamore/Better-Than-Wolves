@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "cachePath": "artifacts/runtime-sources/fabric-loader-0.18.2.jar",
+      "sourceUrl": "https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.18.2/fabric-loader-0.18.2.jar",
+      "sizeBytes": 1944281,
+      "sha256": "3ab7f6b1732170394e77c9f31f8b598928f8766546f9849482431ddbd21f1acd",
+      "modIds": ["mixinextras"]
+    }
+  ]
+}

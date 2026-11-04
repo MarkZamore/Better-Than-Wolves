@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "packId": "better-than-wolves",
+  "files": [
+    {
+      "path": "mods/btwce-3.1.1.jar",
+      "sizeBytes": 48017821,
+      "sha256": "ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d",
+      "sourceUrl": "https://cdn.modrinth.com/data/PiC4CKoa/versions/zLnGXEI4/btwce-3.1.1.jar",
+      "sha1": "97e252c289ff3f205d011a9b8473d1f91aa55259",
+      "sha512": "1ebbbf00844844dc23651401aacb0b410c39c9543bab79ce329bfe777e5f328bc69b11e08b88e13eb7ba160ff87fe7733423a12398f5252f75e3b54f25470af9",
+      "projectId": "PiC4CKoa",
+      "versionId": "zLnGXEI4",
+      "version": "3.1.1",
+      "websiteUrl": "https://modrinth.com/mod/PiC4CKoa"
+    },
+    {
+      "path": "mods/Nightmare-Mode-1.1.6.jar",
+      "sizeBytes": 12053870,
+      "sha256": "be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248",
+      "sourceUrl": "https://cdn.modrinth.com/data/Br97uX7n/versions/MiTHb6KB/Nightmare-Mode-1.1.6.jar",
+      "sha1": "e9fffe856f2edfed871a18817f7fd5f22032d8b8",
+      "sha512": "2145aac159ccf31378d4cd845eed097b8f2e3f19cb0e7124c1d3389c3b0ae5df44555d59024055d08aa584148dd471ce0e7b80ed838f4b5f6902b25f9bf7181a",
+      "projectId": "Br97uX7n",
+      "versionId": "MiTHb6KB",
+      "version": "v1.1.6",
+      "websiteUrl": "https://modrinth.com/mod/Br97uX7n"
+    },
+    {
+      "path": "minecraft-1.6.4-client.jar",
+      "sizeBytes": 4745096,
+      "sha256": "f4513e51c766cdd1d32ca8acd0835d7e16e2851ebea3f2a3b4ce5ae696baf3ae",
+      "sourceUrl": "https://launcher.mojang.com/v1/objects/1703704407101cf72bd88e68579e3696ce733ecd/client.jar",
+      "sha1": "1703704407101cf72bd88e68579e3696ce733ecd",
+      "type": "mojang-client"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+/artifacts/
+/dist/
+/mods/
+/minecraft-*-client.jar
+__pycache__/
+*.pyc
+*.log
+**/bin/
+**/obj/

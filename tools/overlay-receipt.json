@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "packId": "better-than-wolves",
+  "upstreamLockSha256": "eae54e75c66700485491494cc9590a2a495cce91fd9f30727c649c9c503cacc3",
+  "overlaySha256": "37112aa5f3b253350f22f0cfe7db763c290d4283bd64d957351f4cd1a02d58fd",
+  "operations": [
+    {
+      "path": "launcher/pack-owned.txt",
+      "sizeBytes": 79,
+      "sha256": "c68b46886599a0cc88afa3c850ead29619909a2631d076399298312bed67b492"
+    },
+    {
+      "path": "mods/btw-lan-bridge-1.0.0.jar",
+      "sizeBytes": 18996,
+      "sha256": "814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172"
+    },
+    {
+      "path": "portable-pack.json",
+      "sizeBytes": 198,
+      "sha256": "cf247c2fc6cd321560b6c261d9e269b534719fb2d9ae277711a4594a385d6d8d"
+    }
+  ]
+}

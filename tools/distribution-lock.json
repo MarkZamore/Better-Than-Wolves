@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "packId": "better-than-wolves",
+  "upstreamLockSha256": "eae54e75c66700485491494cc9590a2a495cce91fd9f30727c649c9c503cacc3",
+  "files": [
+    {
+      "path": "launcher/pack-owned.txt",
+      "sizeBytes": 79,
+      "sha256": "c68b46886599a0cc88afa3c850ead29619909a2631d076399298312bed67b492"
+    },
+    {
+      "path": "minecraft-1.6.4-client.jar",
+      "sizeBytes": 4745096,
+      "sha256": "f4513e51c766cdd1d32ca8acd0835d7e16e2851ebea3f2a3b4ce5ae696baf3ae"
+    },
+    {
+      "path": "mods/Nightmare-Mode-1.1.6.jar",
+      "sizeBytes": 12053870,
+      "sha256": "be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248"
+    },
+    {
+      "path": "mods/btw-lan-bridge-1.0.0.jar",
+      "sizeBytes": 18996,
+      "sha256": "814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172"
+    },
+    {
+      "path": "mods/btwce-3.1.1.jar",
+      "sizeBytes": 48017821,
+      "sha256": "ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d"
+    },
+    {
+      "path": "portable-pack.json",
+      "sizeBytes": 198,
+      "sha256": "cf247c2fc6cd321560b6c261d9e269b534719fb2d9ae277711a4594a385d6d8d"
+    }
+  ],
+  "supportFiles": [
+    {
+      "path": "library/content.json",
+      "sizeBytes": 1211,
+      "sha256": "4ca6ecc407faa7a30925c969a9a3082b226da038421710939b2dcc1bdc64f698"
+    },
+    {
+      "path": "library/mod-pages.json",
+      "sizeBytes": 732,
+      "sha256": "0c27d5fdb4726823f8c1f2dde40c083355cbe21fac7815aa8558ddfab48f9688"
+    },
+    {
+      "path": "library/preview.jpg",
+      "sizeBytes": 35747,
+      "sha256": "c639f34d7e240728f4e50b0fc7731f8285bc3b431a0699ae069a5c4f276cfd0f"
+    },
+    {
+      "path": "library/README.md",
+      "sizeBytes": 6416,
+      "sha256": "54554ccdfd9d243891d1e323015ad0ae1b4c07eb7f3ee38d226907b77a3dd2a9"
+    },
+    {
+      "path": "library/runtime-sources.json",
+      "sizeBytes": 382,
+      "sha256": "581dae94e220d41d584554bbc562b6bc75df27ed577b42c7d2724b6851ad3db8"
+    },
+    {
+      "path": "library/loaded-mods.json",
+      "sizeBytes": 2473,
+      "sha256": "e61acc84bad0d2b230a5b67d81219e9a59068cb4a2379b2ab49f50a58be66f20"
+    }
+  ]
+}

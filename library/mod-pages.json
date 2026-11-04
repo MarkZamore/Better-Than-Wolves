@@ -1,0 +1,13 @@
+{
+  "btw": "https://modrinth.com/mod/btwce",
+  "nightmare": "https://modrinth.com/mod/nightmare-mode-btw",
+  "grossfabrichacks": "https://github.com/Ueaj-Kerman/GrossFabricHacks",
+  "net_bytebuddy_byte-buddy-agent": "https://github.com/raphw/byte-buddy",
+  "net_auoeke_reflect": "https://github.com/nnym/reflect",
+  "net_auoeke_unsafe": "https://github.com/nnym/unsafe",
+  "org_apache_logging_log4j_log4j-core": "https://logging.apache.org/log4j/2.x/",
+  "org_apache_logging_log4j_log4j-api": "https://logging.apache.org/log4j/2.x/",
+  "com_typesafe_config": "https://github.com/lightbend/config",
+  "btw_lan_bridge": "https://github.com/MarkZamore/Better-Than-Wolves",
+  "mixinextras": "https://github.com/LlamaLad7/MixinExtras"
+}

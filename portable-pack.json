@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "minecraftVersion": "1.6.4",
+  "loader": {
+    "type": "legacyfabric",
+    "version": "0.18.2"
+  },
+  "clientJar": "minecraft-1.6.4-client.jar",
+  "javaMajorVersion": 17
+}

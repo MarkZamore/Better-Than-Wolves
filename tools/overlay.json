@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "packId": "better-than-wolves",
+  "purpose": "Preserve reviewed runtime descriptor, explicit config ownership and the identity/skin/title bridge across upstream preparation.",
+  "reviewedBaseFiles": [
+    {
+      "path": "mods/btwce-3.1.1.jar",
+      "sizeBytes": 48017821,
+      "sha256": "ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d"
+    },
+    {
+      "path": "mods/Nightmare-Mode-1.1.6.jar",
+      "sizeBytes": 12053870,
+      "sha256": "be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "portable-pack.json",
+      "sizeBytes": 198,
+      "sha256": "cf247c2fc6cd321560b6c261d9e269b534719fb2d9ae277711a4594a385d6d8d"
+    },
+    {
+      "path": "launcher/pack-owned.txt",
+      "sizeBytes": 79,
+      "sha256": "c68b46886599a0cc88afa3c850ead29619909a2631d076399298312bed67b492"
+    }
+  ],
+  "bridge": {
+    "path": "mods/btw-lan-bridge-1.0.0.jar",
+    "modId": "btw_lan_bridge",
+    "builder": "tools/legacy-bridge/build_bridge.py",
+    "sizeBytes": 18996,
+    "sha256": "814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172",
+    "recipeFiles": [
+      {
+        "path": "tools/legacy-bridge/.gitignore",
+        "sizeBytes": 12,
+        "sha256": "defc758c6720f3e63dbe47182a9c485a47eeed2999b3903f8dbfbdca4c906499"
+      },
+      {
+        "path": "tools/legacy-bridge/build_bridge.py",
+        "sizeBytes": 5553,
+        "sha256": "566615b6cd6c30a52050386e12efe854ac4a53968c421000387ae818740c0599"
+      },
+      {
+        "path": "tools/legacy-bridge/LICENSE",
+        "sizeBytes": 1082,
+        "sha256": "f978f01a564562bc4e7e6dc9026a89237893403a386d730127103c9e28728a6e"
+      },
+      {
+        "path": "tools/legacy-bridge/README.md",
+        "sizeBytes": 6325,
+        "sha256": "4f4fea4bfe6285e53b8a1d2f051b0c27036f44c8dca4c8ba37054340fa015843"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/BridgeClient.java",
+        "sizeBytes": 1825,
+        "sha256": "f614230cac7da41d0c29bf0d47f88b7795fd2fe55b6cda7c47488cee16953da4"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/CapeDownloadMixin.java",
+        "sizeBytes": 991,
+        "sha256": "7116d3cb2fb408ce0b683e06d6fcfe889f02eed16ad4c662d67d41a98e37d4a9"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/CapeRenderMixin.java",
+        "sizeBytes": 1300,
+        "sha256": "2f16424379746a208d375e6229fefc4b0ac950b0865a6f47534c68da04d4e372"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/ClientLifecycleMixin.java",
+        "sizeBytes": 1526,
+        "sha256": "b8130247c1bffebf2f7381172d4dc533ac8325c7e2ae0f8bb0d43111dc250a58"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/LivingNameEffectsMixin.java",
+        "sizeBytes": 813,
+        "sha256": "c6dc302bd31dc80edd34439c92061af215010ccc5d90791c025ee9f6648f9cc0"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/PlayerNameEffectsMixin.java",
+        "sizeBytes": 736,
+        "sha256": "93e24dd8cdc47e5b22a8327498d3d7d49d4b56d0ddd46e6c80576d0cf7261e57"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/ProfileLookupMixin.java",
+        "sizeBytes": 907,
+        "sha256": "a583c44afe77699224f77c61957c5384007df838ffb20f2c2f29f2ec1550fcdd"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/RegistryData.java",
+        "sizeBytes": 4165,
+        "sha256": "74b463cc2d27f7004b2b5c14ef522be8f9c3b888968d0a3e582c18ea23d0f6e3"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/SkinProfiles.java",
+        "sizeBytes": 8848,
+        "sha256": "9354a813bfb68e50ec484fc5fa37c4723f74c6e84839e8e9e7fc0e54b34d31dd"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/resources/btw-lan-bridge.mixins.json",
+        "sizeBytes": 320,
+        "sha256": "630c82a38afdc92407cf93393acc713a246523accc47771c2140268b995719bb"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/resources/fabric.mod.json",
+        "sizeBytes": 563,
+        "sha256": "a0fb537764c1cab3c64b837cd89c05caacf45e5120f6b4c1edf3b7e21daa6538"
+      },
+      {
+        "path": "tools/legacy-bridge/src/test/java/org/lanminecraft/btwbridge/RegistryDataTest.java",
+        "sizeBytes": 4240,
+        "sha256": "45f1d6e11663a6a6b141627c12ab22c996369f00a8132749400256da16fb548e"
+      }
+    ],
+    "status": "reviewed-final"
+  }
+}
