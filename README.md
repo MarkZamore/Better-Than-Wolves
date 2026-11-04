@@ -48,10 +48,17 @@ python -B tools/update_upstream.py --pack . --upstream-lock artifacts/reviewed-n
 
 ## Публикация
 
-Workflow восстанавливает и проверяет закреплённую поставку, запускает Python tests и публикует content-addressed payload перед authoritative `pack-manifest.json` в rolling release `pack-latest`. Публичные файлы нужно независимо проверить:
+Workflow восстанавливает и проверяет закреплённую поставку, запускает Python tests и сначала полностью скачивает публичный совместимый лаунчер `latest` (релиз не ниже 445), `update.json` и все объявленные EXE/delta assets. Проверяются реальные byte counts, SHA256 и GitHub server digests, а также неизменность public snapshot во время загрузки. Новые версии выше 445 принимаются; сама поддержка функций по-прежнему определяется тремя capabilities манифеста, а не одним номером. Этот отчёт проверяет доставку, не заменяет Defender или runtime acceptance.
+
+Затем публикуются content-addressed payload перед authoritative `pack-manifest.json` в rolling release `pack-latest`. После публикации отдельный процесс на чистом GitHub runner заново скачивает **все** публичные assets сборки и проверяет revision, hashes, archive members и библиотеку. Это настоящий повторный public download на runner; проверка API digest без полного тела не выдаётся за него. На медленном локальном соединении такой результат не называется локальным повторным скачиванием.
+
+Обе проверки доступны вручную при подходящем соединении:
 
 ```text
+python -B tools/verify_launcher_delivery.py --out artifacts/launcher-public-<revision> --minimum-release 445
 python -B tools/verify_published.py --pack . --out artifacts/public-<revision> --revision <full-commit-sha>
 ```
 
 Команда требует новый выходной каталог, сверяет все assets/revision/SHA/ZIP members/metadata/library. Только после успешной проверки добавляется `tools/catalog-entry.json` в актуальный GitHub каталог LANMinecraft. Карточка сама по себе не требует выпуска EXE, но для новой платформы сначала должен выйти совместимый общий лаунчер. Изображение и официальные ссылки документированы в `library/README.md`.
+
+CI сохраняет artifact `btw-public-delivery-<source-sha>` только с ограниченными публичными JSON-отчётами, launcher update pointer, pack manifest, library metadata и preview. EXE, дельты, игровые JAR, личные registry/скины и raw logs туда не входят. `collect_public_proof.py` ограничивает размеры и извлекает только два заранее известных library members. Финальная проверенная source revision и фактические public-byte результаты записываются также в release notes; этот документ и `TESTING-STATUS.md` остаются снимком подготовки, без бесконечного изменения payload revision ради описания завершённой публикации.

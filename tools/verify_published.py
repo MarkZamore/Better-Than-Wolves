@@ -60,7 +60,7 @@ class OfficialRedirects(HTTPRedirectHandler):
 
 def open_public(value, api=False):
     official_url(value)
-    headers = {"User-Agent": USER_AGENT, "Accept-Encoding": "identity"}
+    headers = {"User-Agent": USER_AGENT, "Accept-Encoding": "identity", "Cache-Control": "no-cache", "Pragma": "no-cache"}
     if api:
         headers.update({"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"})
     try:
@@ -301,6 +301,7 @@ def verify_published(pack, out, revision):
                     check(hashlib.file_digest(stream, server[0]).hexdigest() == server[1], "Final public server digest differs: " + result["name"])
             result["serverDigestVerified"] = True
     report = {"status": "PASS", "repository": owner + "/" + repo, "tag": tag, "revision": revision,
+              "manifestSha256": manifest_result["sha256"], "downloadedAssetPins": sorted(results, key=lambda row: row["name"]),
               "name": identity(pack)["name"], "activeFiles": len(files), "payloadAssets": len(assets),
               "allUploadedAssetsVerified": len(results), "libraryMetadataRows": metadata_rows, "modCount": loaded,
               "githubServerDigestsVerified": sum(row["serverDigestVerified"] for row in results),

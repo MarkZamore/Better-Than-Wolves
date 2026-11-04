@@ -10,6 +10,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -31,6 +32,8 @@ jobs:
         run: |
           python -B tools/generate_manifest.py --pack . --out dist --revision "$GITHUB_SHA"
           python -B tools/generate_manifest.py --pack . --out dist --verify-only
+      - name: Fresh download of the compatible public launcher and all deltas
+        run: python -B tools/verify_launcher_delivery.py --out artifacts/public-launcher --minimum-release 445
       - name: Publish all payloads before authoritative manifest
         env:
           GH_TOKEN: ${{ github.token }}
@@ -69,3 +72,14 @@ jobs:
             [ -n "$name" ] || continue
             gh release delete-asset pack-latest "$name" --yes
           done < <(comm -23 artifacts/previous-assets.txt artifacts/wanted-assets.txt)
+      - name: Fresh download and verify every public pack asset
+        run: python -B tools/verify_published.py --pack . --out artifacts/public-pack --revision "$GITHUB_SHA"
+      - name: Collect bounded public delivery proof
+        run: python -B tools/collect_public_proof.py --launcher artifacts/public-launcher --pack artifacts/public-pack --out artifacts/public-proof --revision "$GITHUB_SHA"
+      - name: Retain only small sanitized public proof and library metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: btw-public-delivery-${{ github.sha }}
+          path: artifacts/public-proof/
+          if-no-files-found: error
+          retention-days: 30
