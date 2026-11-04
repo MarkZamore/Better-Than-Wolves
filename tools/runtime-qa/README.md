@@ -1,5 +1,24 @@
 # Native Better Than Wolves runtime QA
 
+## Source publication checks
+
+The pack's Python suite contains 54 declared test methods, including 11 library
+checks for Minecraft 1.6.4 / Legacy Fabric 0.18.2. Its synthetic JARs use Fabric
+metadata and registered nested JARs. The standalone-library checks retain the
+current loader, deterministic Windows/Linux ZIPs, project-page validation,
+actual-inventory hash binding and stale-JAR rejection.
+
+Pack-local copies of filtered-addition/group presentation and Forge-only
+component tests were removed because this pack does not use those policies.
+Their full generic coverage remains in the launcher's
+[`tools/test_pack_library.py`](https://github.com/MarkZamore/LANMinecraft/blob/1b728eb7359e05af1939ac022fbb7f3f2d312be0/tools/test_pack_library.py).
+The Legacy Fabric metadata case no longer repeats the unrelated Fabric/Quilt
+branches. Update/restore, bridge identity, source/path/hash, delivery receipts
+and all native acceptance probes remain separate necessary checks.
+
+This reduction was a static source audit only. No tests, native probes, builds
+or publication validators were rerun for it; it establishes no new runtime PASS.
+
 These tools operate only on marked, independent fixtures below `artifacts`.
 They do not copy or open personal worlds. Java instrumentation is QA-only and
 must never enter pack payloads or active distribution locks.
