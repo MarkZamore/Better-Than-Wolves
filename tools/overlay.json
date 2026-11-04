@@ -39,11 +39,6 @@
         "sha256": "defc758c6720f3e63dbe47182a9c485a47eeed2999b3903f8dbfbdca4c906499"
       },
       {
-        "path": "tools/legacy-bridge/build_bridge.py",
-        "sizeBytes": 5553,
-        "sha256": "566615b6cd6c30a52050386e12efe854ac4a53968c421000387ae818740c0599"
-      },
-      {
         "path": "tools/legacy-bridge/LICENSE",
         "sizeBytes": 1082,
         "sha256": "f978f01a564562bc4e7e6dc9026a89237893403a386d730127103c9e28728a6e"
@@ -54,9 +49,24 @@
         "sha256": "4f4fea4bfe6285e53b8a1d2f051b0c27036f44c8dca4c8ba37054340fa015843"
       },
       {
+        "path": "tools/legacy-bridge/build_bridge.py",
+        "sizeBytes": 5553,
+        "sha256": "566615b6cd6c30a52050386e12efe854ac4a53968c421000387ae818740c0599"
+      },
+      {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/BridgeClient.java",
         "sizeBytes": 1825,
         "sha256": "f614230cac7da41d0c29bf0d47f88b7795fd2fe55b6cda7c47488cee16953da4"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/RegistryData.java",
+        "sizeBytes": 4165,
+        "sha256": "74b463cc2d27f7004b2b5c14ef522be8f9c3b888968d0a3e582c18ea23d0f6e3"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/SkinProfiles.java",
+        "sizeBytes": 8848,
+        "sha256": "9354a813bfb68e50ec484fc5fa37c4723f74c6e84839e8e9e7fc0e54b34d31dd"
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/CapeDownloadMixin.java",
@@ -87,16 +97,6 @@
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/ProfileLookupMixin.java",
         "sizeBytes": 907,
         "sha256": "a583c44afe77699224f77c61957c5384007df838ffb20f2c2f29f2ec1550fcdd"
-      },
-      {
-        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/RegistryData.java",
-        "sizeBytes": 4165,
-        "sha256": "74b463cc2d27f7004b2b5c14ef522be8f9c3b888968d0a3e582c18ea23d0f6e3"
-      },
-      {
-        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/SkinProfiles.java",
-        "sizeBytes": 8848,
-        "sha256": "9354a813bfb68e50ec484fc5fa37c4723f74c6e84839e8e9e7fc0e54b34d31dd"
       },
       {
         "path": "tools/legacy-bridge/src/main/resources/btw-lan-bridge.mixins.json",

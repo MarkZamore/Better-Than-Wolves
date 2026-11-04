@@ -3,7 +3,7 @@ import io, json
 from pathlib import Path
 import tempfile, unittest, zipfile
 from pack_pipeline import fingerprint, read_json, write_json, freeze, verify
-from update_upstream import prepare_update, finalize_reviewed_overlay, verify_receipt, write_receipt, copy_scaffold
+from update_upstream import prepare_update, finalize_reviewed_overlay, verify_receipt, write_receipt, copy_scaffold, recipe_inventory
 
 def mod(path, mod_id, version):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -70,6 +70,12 @@ class MandatoryOverlayUpdateTests(unittest.TestCase):
     def test_recipe_or_receipt_drift_is_rejected(self):
         (self.source/'tools/legacy-bridge/build_bridge.py').write_text('# unreviewed source drift\n')
         with self.assertRaisesRegex(ValueError,'recipe differs'): verify_receipt(self.source)
+
+    def test_recipe_order_uses_portable_relative_strings_instead_of_os_path_comparison(self):
+        root=self.source/'tools/legacy-bridge'
+        for name in ('LICENSE','README.md','Z.java','alpha.py'):(root/name).write_text('synthetic source\n')
+        paths=[row['path'] for row in recipe_inventory(self.source)]
+        self.assertEqual(sorted(paths),paths)
 
     def test_candidate_scaffold_excludes_generated_qa_host_outputs(self):
         for rel in ('tools/runtime-qa/host/bin/private.dll','tools/runtime-qa/host/obj/cache.json','tools/runtime-qa/host/TestResults/private.trx'):

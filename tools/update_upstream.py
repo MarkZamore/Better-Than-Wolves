@@ -11,7 +11,7 @@ from pack_pipeline import PACK_ID, read_json, write_json, require, safe, matches
 def recipe_inventory(pack):
     pack = Path(pack).resolve(); rows = []
     root = pack / 'tools/legacy-bridge'
-    for path in sorted(root.rglob('*')):
+    for path in sorted(root.rglob('*'), key=lambda item: item.relative_to(root).as_posix()):
         if path.is_file() and not any(part in {'artifacts', '__pycache__'} for part in path.relative_to(root).parts) and path.suffix != '.pyc':
             rows.append({'path': path.relative_to(pack).as_posix(), **fingerprint(path)})
     return rows
