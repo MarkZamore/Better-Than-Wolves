@@ -18,8 +18,9 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          # Runtime is Java 17; the helper's deterministic compiler is pinned separately.
-          java-version: '21.0.12.1+1'
+          # Adoptium's exact SemVer selector for the compiler release 21.0.12.1+1.
+          # Runtime/bytecode target remains Java 17.
+          java-version: '21.0.12+101.0.LTS'
       - name: Restore exact pinned distribution
         run: python -B tools/restore_distribution.py --pack .
       - name: Validate source and publication boundaries
