@@ -4,6 +4,14 @@ These tools operate only on marked, independent fixtures below `artifacts`.
 They do not copy or open personal worlds. Java instrumentation is QA-only and
 must never enter pack payloads or active distribution locks.
 
+The C# production preparation/account/launch-context host is owned here too:
+[host/README.md](host/README.md). It uses an explicit external `LauncherProject`
+reference to a compatible launcher checkout; the production runtime, instance,
+Steam, profile and save services remain implemented in the launcher. Build with
+Windows/.NET 10 SDK and choose host outputs under `artifacts`. Pack-specific
+platform guards, fixture markers, inputs and acceptance scenarios live only in
+this repository.
+
 Prepare the official Minecraft 1.6.4 and Legacy Fabric 0.18.2 libraries/assets:
 
 ```text
@@ -44,8 +52,8 @@ results should be summarized in `TESTING-STATUS.md`.
 
 ## Exact production launch and retained progress
 
-`run_production.py` consumes the private context from the launcher's
-`tools/LegacyRuntimeQa` exporter. It preserves the actual CmlLib arguments,
+`run_production.py` consumes the private context from this stand's
+`host/LegacyRuntimeQa` exporter. It preserves the actual CmlLib arguments,
 selected Java, environment changes and production Notice agent. It inserts
 only the QA agent/properties before the main class and submits the real game
 PID to the exporter's Notice binding request. Arguments and account values are

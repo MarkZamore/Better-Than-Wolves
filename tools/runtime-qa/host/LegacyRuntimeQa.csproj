@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputPath Condition="'$(QaOutputPath)' != ''">$(QaOutputPath)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(LauncherProject)' != ''">
+    <ProjectReference Include="$(LauncherProject)" />
+  </ItemGroup>
+  <Target Name="ValidateLauncherProject" BeforeTargets="CollectPackageReferences;ResolveProjectReferences">
+    <Error Condition="'$(LauncherProject)' == ''" Text="Pass -p:LauncherProject=ABSOLUTE_PATH_TO_LANMINECRAFT_PROGRAM_MINECRAFT_CSPROJ. The QA host does not embed a launcher workspace path." />
+    <Error Condition="'$(LauncherProject)' != '' and !Exists('$(LauncherProject)')" Text="The supplied LauncherProject does not exist." />
+  </Target>
+</Project>

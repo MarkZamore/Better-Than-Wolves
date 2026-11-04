@@ -67,7 +67,7 @@ def finalize_reviewed_overlay(pack):
     return {'status': 'REVIEW_RECEIPT_RECORDED', 'bridge': bridge['path'], 'sha256': bridge['sha256']}
 
 def copy_scaffold(source, out):
-    def ignore(directory, names): return {name for name in names if name in {'artifacts', '__pycache__', '.git'} or name.endswith('.pyc')}
+    def ignore(directory, names): return {name for name in names if name in {'artifacts', '__pycache__', '.git', 'bin', 'obj', 'TestResults'} or name.endswith('.pyc')}
     for name in ('tools', 'library', '.github'):
         if (source / name).exists(): shutil.copytree(source / name, out / name, ignore=ignore)
     (out / 'library/loaded-mods.json').unlink(missing_ok=True)

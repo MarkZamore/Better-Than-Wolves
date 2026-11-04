@@ -3,7 +3,7 @@ import io, json
 from pathlib import Path
 import tempfile, unittest, zipfile
 from pack_pipeline import fingerprint, read_json, write_json, freeze, verify
-from update_upstream import prepare_update, finalize_reviewed_overlay, verify_receipt, write_receipt
+from update_upstream import prepare_update, finalize_reviewed_overlay, verify_receipt, write_receipt, copy_scaffold
 
 def mod(path, mod_id, version):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -70,6 +70,14 @@ class MandatoryOverlayUpdateTests(unittest.TestCase):
     def test_recipe_or_receipt_drift_is_rejected(self):
         (self.source/'tools/legacy-bridge/build_bridge.py').write_text('# unreviewed source drift\n')
         with self.assertRaisesRegex(ValueError,'recipe differs'): verify_receipt(self.source)
+
+    def test_candidate_scaffold_excludes_generated_qa_host_outputs(self):
+        for rel in ('tools/runtime-qa/host/bin/private.dll','tools/runtime-qa/host/obj/cache.json','tools/runtime-qa/host/TestResults/private.trx'):
+            path=self.source/rel;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('private generated fixture data')
+        source_file=self.source/'tools/runtime-qa/host/Program.cs';source_file.write_text('// owned QA source\n')
+        target=self.root/'artifacts/scaffold';target.mkdir(parents=True);copy_scaffold(self.source,target)
+        self.assertEqual(source_file.read_bytes(),(target/'tools/runtime-qa/host/Program.cs').read_bytes())
+        self.assertFalse((target/'tools/runtime-qa/host/bin').exists());self.assertFalse((target/'tools/runtime-qa/host/obj').exists());self.assertFalse((target/'tools/runtime-qa/host/TestResults').exists())
 
     def test_changed_current_author_cannot_be_adopted_by_refreshing_only_upstream_and_receipt(self):
         rel='mods/Nightmare-Mode-1.1.6.jar'; path=self.source/rel

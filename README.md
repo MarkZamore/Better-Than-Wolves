@@ -44,6 +44,8 @@ python -B tools/update_upstream.py --pack . --upstream-lock artifacts/reviewed-n
 
 Фактический ModList фиксируется после native QA командой `python -B tools/record_runtime_inventory.py --pack . --evidence <private-evidence-directory>`. Она сверяет реально запущенные SHA исходных JAR и вложенное происхождение MixinExtras. В библиотеке 11 модов с техническими компонентами; Minecraft/Java/Loader и отдельно управляемый e4steam исключены. Private evidence и скин в репозиторий не копируются. Проверена публикация собственного Steam-мира на одном аккаунте и одном ПК; соединение двух реальных Steam-участников и смена их ролей не объявлены выполненными.
 
+Весь специфичный для этой сборки acceptance stand находится в `tools/runtime-qa`, включая C# host в `tools/runtime-qa/host`. Он использует production services через обязательный внешний `LauncherProject`, без личного workspace path и без копирования реализации лаунчера. Перенос QA host не меняет игровые payload или принятые runtime hashes.
+
 ## Публикация
 
 Workflow восстанавливает и проверяет закреплённую поставку, запускает Python tests и публикует content-addressed payload перед authoritative `pack-manifest.json` в rolling release `pack-latest`. Публичные файлы нужно независимо проверить:
