@@ -9,7 +9,7 @@ def build(fixture,jdk,asm=None):
     with tempfile.TemporaryDirectory(prefix="qa-classes-",dir=out) as temporary:
         classes=Path(temporary).resolve()
         if not classes.is_relative_to(out.resolve()):raise ValueError("QA compilation escaped instrumentation folder")
-        subprocess.run([str(jdk/"bin/javac.exe"),"--release","17","-g:none","-cp",str(asm),"-d",str(classes),str(here/"BtwQaAgent.java")],check=True)
+        subprocess.run([str(jdk/"bin/javac.exe"),"--release","17","-encoding","UTF-8","-g:none","-cp",str(asm),"-d",str(classes),str(here/"BtwQaAgent.java")],check=True)
         with zipfile.ZipFile(jar,"w",compression=zipfile.ZIP_STORED) as z:
             def put(name,data):
                 info=zipfile.ZipInfo(name,(1980,1,1,0,0,0));info.create_system=3;info.external_attr=0o100644<<16;z.writestr(info,data)

@@ -3,11 +3,11 @@
   "id": "btw_lan_bridge",
   "version": "1.0.0",
   "name": "BTW Launcher Profile Bridge",
-  "description": "Connects launcher skin profiles and the pack title to the existing BTW client APIs.",
+  "description": "Connects launcher profiles and the pack title to BTW, and preserves Creative guest mode in Creative worlds.",
   "environment": "client",
   "entrypoints": {"client": ["org.lanminecraft.btwbridge.BridgeClient"]},
   "mixins": ["btw-lan-bridge.mixins.json"],
   "license": "MIT",
   "contact": {"sources": "https://github.com/MarkZamore/Better-Than-Wolves"},
-  "depends": {"minecraft": "1.6.4", "fabricloader": ">=0.18.0", "java": ">=17 <=21", "btw": "3.1.1"}
+  "depends": {"minecraft": "1.6.4", "fabricloader": ">=0.18.0", "java": ">=17 <=21", "btw": "3.1.1", "nightmare": "1.1.6"}
 }

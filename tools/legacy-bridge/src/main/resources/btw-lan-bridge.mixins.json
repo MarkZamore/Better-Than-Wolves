@@ -3,6 +3,10 @@
   "minVersion": "0.8",
   "package": "org.lanminecraft.btwbridge.mixin",
   "compatibilityLevel": "JAVA_17",
-  "client": ["ClientLifecycleMixin", "ProfileLookupMixin", "CapeDownloadMixin", "CapeRenderMixin", "PlayerNameEffectsMixin", "LivingNameEffectsMixin"],
+  "client": [
+    "ClientLifecycleMixin", "ProfileLookupMixin", "CapeDownloadMixin", "CapeRenderMixin",
+    "PlayerNameEffectsMixin", "LivingNameEffectsMixin", "LanGuestModeMixin",
+    "BtwAchievementDisplayMixin", "NightmareAchievementDisplayMixin"
+  ],
   "injectors": {"defaultRequire": 1}
 }

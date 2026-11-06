@@ -6,7 +6,7 @@
     "version": "0.18.2"
   },
   "sourceJars": {
-    "mods/btw-lan-bridge-1.0.0.jar": "814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172",
+    "mods/btw-lan-bridge-1.0.0.jar": "16765c1b038b23dccb64ca1f968a4116930e818aa520f5197f0eb94e6c47cb5a",
     "mods/btwce-3.1.1.jar": "ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d",
     "mods/Nightmare-Mode-1.1.6.jar": "be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248"
   },
@@ -71,7 +71,7 @@
     }
   ],
   "capture": {
-    "evidenceLabel": "production-rename-09",
+    "evidenceLabel": "session-fixes-native",
     "actualLoaderRecords": 15,
     "excludedPlatformAndManagedIds": {
       "e4steam": "launcher-managed shared transport",

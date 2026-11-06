@@ -12,6 +12,11 @@ import org.objectweb.asm.*;
 public final class BtwQaAgent implements ClassFileTransformer {
     private static Path fixture, game, evidence;
     private static String world, mode;
+    private static boolean lanModeProbe, lanModeObserved;
+    private static int lanProbeCalls;
+    private static String lanProbeMode;
+    private static boolean lanProbeCommands;
+    private static String lanProbeChat;
     private static boolean busy, started, joined, leaving, ended, failed, published, publicationObserved, skinObserved, atlasObserved;
     private static int menuTicks, worldTicks, retryTicks;
     private static long joinedAt;
@@ -53,6 +58,9 @@ public final class BtwQaAgent implements ClassFileTransformer {
         if(!game.startsWith(fixture)||!evidence.startsWith(fixture))throw new SecurityException("QA path escape");
         world=required("world");mode=required("mode");
         if(!world.matches("BtwQa[A-Za-z0-9_-]{0,40}") || !(mode.equals("fresh")||mode.equals("reenter")))throw new SecurityException("Invalid native action");
+        lanModeProbe = Boolean.getBoolean("btw.qa.lanGuestMode");
+        if (lanModeProbe && Boolean.getBoolean("btw.qa.publish"))
+            throw new SecurityException("Guest mode probe requires isolated publication");
         Path save=game.resolve("saves").resolve(world);
         if(mode.equals("fresh")&&Files.exists(save))throw new SecurityException("Fresh world exists");
         if(mode.equals("reenter")&&!Files.isRegularFile(save.resolve("level.dat")))throw new SecurityException("Reentry world missing");
@@ -65,13 +73,52 @@ public final class BtwQaAgent implements ClassFileTransformer {
         boolean server=name.equals("net/minecraft/server/MinecraftServer");
         boolean font=name.equals("net/minecraft/class_370");
         boolean living=name.equals("net/minecraft/class_1635");
-        if(!name.equals("net/minecraft/class_1600")&&!render&&!server&&!font&&!living)return null;
+        boolean isolatedShare = lanModeProbe && name.equals("net/minecraft/class_601");
+        boolean isolatedSteam = lanModeProbe && name.equals("link/e4steam/retro/RetroBootstrap");
+        boolean observeChat = lanModeProbe && name.equals("net/minecraft/class_357");
+        if(!name.equals("net/minecraft/class_1600")&&!render&&!server&&!font&&!living
+                &&!isolatedShare&&!isolatedSteam&&!observeChat)return null;
         try {
             ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
             final int[] count={0};
             reader.accept(new ClassVisitor(Opcodes.ASM9,writer){
                 public MethodVisitor visitMethod(int access,String n,String descriptor,String sig,String[] exceptions){
                     MethodVisitor target=super.visitMethod(access,n,descriptor,sig,exceptions);
+                    if (isolatedShare && n.equals("method_3000")
+                            && descriptor.equals("(Lnet/minecraft/class_1157;Z)Ljava/lang/String;")) {
+                        // Observe the real native screen's transformed arguments without opening
+                        // an unauthenticated TCP listener or broadcasting a fixture on the LAN.
+                        count[0]++;
+                        target.visitCode();
+                        target.visitVarInsn(Opcodes.ALOAD, 1);
+                        target.visitVarInsn(Opcodes.ILOAD, 2);
+                        target.visitMethodInsn(Opcodes.INVOKESTATIC, "BtwQaAgent", "observeLanShare",
+                            "(Ljava/lang/Object;Z)Ljava/lang/String;", false);
+                        target.visitInsn(Opcodes.ARETURN);
+                        target.visitMaxs(0, 0);
+                        target.visitEnd();
+                        return null;
+                    }
+                    if (isolatedSteam && n.equals("install")
+                            && descriptor.equals("(Ljava/lang/String;Llink/e4steam/retro/RetroPlatform;)V")) {
+                        // Load the exact transport's mixins without opening the real Steam account.
+                        count[0]++;
+                        target.visitCode();
+                        target.visitInsn(Opcodes.RETURN);
+                        target.visitMaxs(0, 0);
+                        target.visitEnd();
+                        return null;
+                    }
+                    if (observeChat && n.equals("method_898") && descriptor.equals("(Ljava/lang/String;)V")) {
+                        count[0]++;
+                        return new MethodVisitor(Opcodes.ASM9, target) {
+                            public void visitCode() {
+                                super.visitCode();
+                                super.visitVarInsn(Opcodes.ALOAD, 1);
+                                super.visitMethodInsn(Opcodes.INVOKESTATIC, "BtwQaAgent", "observeShareChat", "(Ljava/lang/String;)V", false);
+                            }
+                        };
+                    }
                     if(!render&&!server&&!font&&!living&&n.equals("method_2954")&&descriptor.equals("()V")) {
                         count[0]++;
                         return new MethodVisitor(Opcodes.ASM9,target){public void visitCode(){super.visitCode();super.visitVarInsn(Opcodes.ALOAD,0);super.visitMethodInsn(Opcodes.INVOKESTATIC,"BtwQaAgent","tick","(Ljava/lang/Object;)V",false);}};
@@ -95,10 +142,21 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 }
             },0);
             if(count[0]!=(font?3:1))throw new IllegalStateException("Wrong native QA target count "+count[0]);
-            event(living?"native_rotation_observer_bound":font?"native_font_observer_bound":server?"native_server_dispatch_bound":render?"native_render_observer_bound":"native_tick_bound",living?"target=net.minecraft.class_1635.method_5777":font?"targets=drawStringWithShadow/drawString":server?"target=MinecraftServer.method_3044":render?"target=net.minecraft.class_570.method_1582":"target=net.minecraft.class_1600.method_2954()V");return writer.toByteArray();
+            if (isolatedShare) event("native_guest_mode_observer_bound", "target=class_601.method_3000;networkSuppressedByQa=true");
+            else if (isolatedSteam) event("native_steam_disabled_in_fixture", "transportMixinsLoaded=true;steamBootstrapSuppressedByQa=true");
+            else if (observeChat) event("native_share_chat_observer_bound", "target=class_357.method_898");
+            else event(living?"native_rotation_observer_bound":font?"native_font_observer_bound":server?"native_server_dispatch_bound":render?"native_render_observer_bound":"native_tick_bound",living?"target=net.minecraft.class_1635.method_5777":font?"targets=drawStringWithShadow/drawString":server?"target=MinecraftServer.method_3044":render?"target=net.minecraft.class_570.method_1582":"target=net.minecraft.class_1600.method_2954()V");
+            return writer.toByteArray();
         } catch(Throwable t){failure(t);throw new IllegalStateException(t);}
     }
     public static void renderSpecialsObserved(){renderSpecialsCalls++;}
+    public static String observeLanShare(Object mode, boolean commands) {
+        lanProbeCalls++;
+        lanProbeMode = ((Enum<?>)mode).name();
+        lanProbeCommands = commands;
+        return "25565";
+    }
+    public static void observeShareChat(String line) { lanProbeChat = line; }
     public static void fontText(String text){if(capturingRowText&&text!=null)ROW_TEXT.add(text);}
     public static void earsObserved(){earCalls++;}
     public static void forwardRotate(float angle,float x,float y,float z){if(angle==180F&&x==0F&&y==0F&&z==1F)upsideDownCalls++;try{Class.forName("org.lwjgl.opengl.GL11",true,Thread.currentThread().getContextClassLoader()).getMethod("glRotatef",float.class,float.class,float.class,float.class).invoke(null,angle,x,y,z);}catch(Exception failure){throw new IllegalStateException(failure);}}
@@ -158,8 +216,15 @@ public final class BtwQaAgent implements ClassFileTransformer {
                     method(create.getClass(),"method_914").invoke(create);
                     if(!world.equals(field(create.getClass(),"field_1096").get(create)))throw new SecurityException("Native save-folder mismatch");
                     method(create.getClass(),"method_1033").invoke(create);
+                    if (lanModeProbe) {
+                        Field selectedMode = field(create.getClass(), "field_1097");
+                        for (int attempt = 0; attempt < 3 && !"creative".equals(selectedMode.get(create)); attempt++)
+                            click(create, 2, true);
+                        if (!"creative".equals(selectedMode.get(create)))
+                            throw new IllegalStateException("The author create-world menu did not select Creative");
+                    }
                     click(create,0,true);
-                    event("native_create_requested","authorGuiDefaultsPreserved=true");
+                    event("native_create_requested", lanModeProbe ? "creativeSelectedThroughNativeGui=true" : "authorGuiDefaultsPreserved=true");
                 } else {
                     Class<?> settings=Class.forName("net.minecraft.class_1156",false,cl);
                     method(client.getClass(),"method_2935",String.class,String.class,settings).invoke(client,world,world,null);
@@ -174,6 +239,11 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 }
                 worldTicks++;
                 if(!atlasObserved && worldTicks>=40){recordAtlases(client,cl);atlasObserved=true;}
+                if (lanModeProbe && !lanModeObserved && worldTicks >= 80) {
+                    verifyGuestMode(client, cl);
+                    verifyAchievementMixins(cl);
+                    lanModeObserved = true;
+                }
                 if(!skinObserved && worldTicks>=60 && !System.getProperty("minecraft.portable.skin.registry","").isBlank()) {
                     String nativeName=(String)field(player.getClass(),"field_3982").get(player);
                     Class<?> profiles=Class.forName("api.client.mojapi.ProfileUtils",true,cl);
@@ -284,6 +354,101 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 event("native_shutdown_requested","normalGameShutdown=true");
             }
         } catch(Throwable t){failure(t);} finally {Thread.currentThread().setContextClassLoader(before);busy=false;}
+    }
+
+    private static void verifyGuestMode(Object client, ClassLoader cl) throws Exception {
+        Object server = method(client.getClass(), "method_2909").invoke(client);
+        Object overworld = method(server.getClass(), "method_2991", int.class).invoke(server, 0);
+        Object worldInfo = method(overworld.getClass(), "method_3588").invoke(overworld);
+        Enum<?> creative = (Enum<?>)method(worldInfo.getClass(), "method_233").invoke(worldInfo);
+        if (!creative.name().equals("CREATIVE")) throw new IllegalStateException("Fixture did not create a Creative overworld");
+        Class<?> modeClass = creative.getDeclaringClass();
+        Object survival = modeClass.getMethod("valueOf", String.class).invoke(null, "SURVIVAL");
+        Method setMode = method(worldInfo.getClass(), "method_207", modeClass);
+        verifyShareArguments(client, cl, "CREATIVE");
+        try {
+            setMode.invoke(worldInfo, survival);
+            verifyShareArguments(client, cl, "SURVIVAL");
+        } finally {
+            setMode.invoke(worldInfo, creative);
+        }
+        verifyReportsNotice(client, cl, server);
+    }
+
+    private static void verifyShareArguments(Object client, ClassLoader cl, String expectedMode) throws Exception {
+        Class<?> screen = Class.forName("net.minecraft.class_388", false, cl);
+        Object pause = Class.forName("net.minecraft.class_385", true, cl).getConstructor().newInstance();
+        Object share = Class.forName("net.minecraft.class_393", true, cl).getConstructor(screen).newInstance(pause);
+        method(client.getClass(), "method_2928", screen).invoke(client, share);
+        List<?> buttons = (List<?>)field(share.getClass(), "field_1232").get(share);
+        if (buttons.contains(field(share.getClass(), "field_1277").get(share))
+                || buttons.contains(field(share.getClass(), "field_1278").get(share)))
+            throw new IllegalStateException("The authored Nightmare mode/commands controls must stay removed");
+        method(client.getClass(), "method_2928", screen).invoke(client, pause);
+        int previousCalls = lanProbeCalls;
+        lanProbeChat = null;
+        click(pause, 7, true);
+        if (lanProbeCalls != previousCalls + 1 || !expectedMode.equals(lanProbeMode) || lanProbeCommands)
+            throw new IllegalStateException("Unexpected native LAN arguments: " + lanProbeMode + " / commands=" + lanProbeCommands);
+        if (lanProbeChat == null || !lanProbeChat.replaceAll("§[0-9a-fk-or]", "").equals("Порт локального сервера: 25565"))
+            throw new IllegalStateException("Unexpected native LAN success message: " + lanProbeChat);
+        event("native_guest_mode_verified", "worldMode=" + expectedMode + ";guestMode=" + lanProbeMode
+            + ";commands=false;authorControlsHidden=true;oneClickPause=true;networkSuppressedByQa=true");
+        event("native_share_chat_verified", "locale=ru_RU;messageMatches=true;syntheticPort=25565");
+    }
+
+    private static void verifyReportsNotice(Object client, ClassLoader cl, Object server) throws Exception {
+        Class<?> screen = Class.forName("net.minecraft.class_388", false, cl);
+        Class<?> pauseType = Class.forName("net.minecraft.class_385", true, cl);
+        Method showScreen = method(client.getClass(), "method_2928", screen);
+        Object before = pauseType.getConstructor().newInstance();
+        showScreen.invoke(client, before);
+        boolean canQuit = field(pauseButton(before, 1).getClass(), "field_1055").getBoolean(pauseButton(before, 1));
+        Field published = field(server.getClass(), "field_2208");
+        if (published.getBoolean(server)) throw new IllegalStateException("The offline publication probe started a real listener");
+        // Emulate only the observed publish state. No Steam session or listener exists.
+        published.setBoolean(server, true);
+        try {
+            Object pause = pauseType.getConstructor().newInstance();
+            showScreen.invoke(client, pause);
+            Object reports = pauseButton(pause, 7);
+            Object quit = pauseButton(pause, 1);
+            if (!"Жалобы".equals(field(reports.getClass(), "field_1053").get(reports))
+                    || !field(reports.getClass(), "field_1055").getBoolean(reports)
+                    || field(quit.getClass(), "field_1055").getBoolean(quit) != canQuit)
+                throw new IllegalStateException("Native reports caption/action or author quit gate mismatch");
+            click(pause, 7, true);
+            Field currentScreen = field(client.getClass(), "field_3816");
+            Object notice = currentScreen.get(client);
+            if (!notice.getClass().getName().equals("net.minecraft.class_475")
+                    || !"Жалобы".equals(field(notice.getClass(), "field_1638").get(notice))
+                    || !"Жалобы на игроков в этой версии недоступны.".equals(field(notice.getClass(), "field_1639").get(notice)))
+                throw new IllegalStateException("Native reports notice did not display the expected copy");
+            click(notice, 0, true);
+            if (currentScreen.get(client) != pause)
+                throw new IllegalStateException("Native report notice did not return to the same pause screen");
+            event("native_reports_notice_verified", "locale=ru_RU;authorQuitGatePreserved=true;returnsToSamePause=true;syntheticPublishedState=true");
+        } finally {
+            published.setBoolean(server, false);
+            showScreen.invoke(client, new Object[]{null});
+        }
+    }
+
+    private static Object pauseButton(Object screen, int id) throws Exception {
+        for (Object button : (List<?>)field(screen.getClass(), "field_1232").get(screen))
+            if (field(button.getClass(), "field_1054").getInt(button) == id) return button;
+        throw new IllegalStateException("Native screen button is missing: " + id);
+    }
+
+    private static void verifyAchievementMixins(ClassLoader cl) throws Exception {
+        for (String owner : List.of("api.achievement.AchievementEventDispatcher",
+                "com.itlesports.nightmaremode.item.items.template.ItemAchievementGranter")) {
+            Class<?> target = Class.forName(owner, false, cl);
+            long redirects = Arrays.stream(target.getDeclaredMethods())
+                .filter(method -> method.getName().endsWith("$achievementDisplayName")).count();
+            if (redirects != 1) throw new IllegalStateException("Expected one applied achievement display redirect: " + owner);
+            event("native_achievement_display_redirect_bound", "target=" + owner + ";announcementNotTriggered=true");
+        }
     }
     private static void nameMechanics(Object client,Object player,ClassLoader cl)throws Exception {
         if(nameMechanicsDone)return;

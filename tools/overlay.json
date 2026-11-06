@@ -35,8 +35,8 @@
     "path": "mods/btw-lan-bridge-1.0.0.jar",
     "modId": "btw_lan_bridge",
     "builder": "tools/legacy-bridge/build_bridge.py",
-    "sizeBytes": 18996,
-    "sha256": "814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172",
+    "sizeBytes": 23334,
+    "sha256": "16765c1b038b23dccb64ca1f968a4116930e818aa520f5197f0eb94e6c47cb5a",
     "recipeFiles": [
       {
         "path": "tools/legacy-bridge/.gitignore",
@@ -50,8 +50,8 @@
       },
       {
         "path": "tools/legacy-bridge/README.md",
-        "sizeBytes": 6325,
-        "sha256": "4f4fea4bfe6285e53b8a1d2f051b0c27036f44c8dca4c8ba37054340fa015843"
+        "sizeBytes": 7108,
+        "sha256": "7c358ae49780977f4b5da46fafaf8365fb26d605e4e79d651073e9bede07178b"
       },
       {
         "path": "tools/legacy-bridge/build_bridge.py",
@@ -60,8 +60,13 @@
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/BridgeClient.java",
-        "sizeBytes": 1825,
-        "sha256": "f614230cac7da41d0c29bf0d47f88b7795fd2fe55b6cda7c47488cee16953da4"
+        "sizeBytes": 2161,
+        "sha256": "c6b79c0adb8cd6c9d75e7f079eafd507b73e9472584ab1dc1c3362ab9a481d16"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/LanGuestMode.java",
+        "sizeBytes": 1918,
+        "sha256": "beee3d3ca1006b03cf400b5a803b04c446a170dee4704cd81c57d5f5842e05a0"
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/RegistryData.java",
@@ -72,6 +77,11 @@
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/SkinProfiles.java",
         "sizeBytes": 8848,
         "sha256": "9354a813bfb68e50ec484fc5fa37c4723f74c6e84839e8e9e7fc0e54b34d31dd"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/BtwAchievementDisplayMixin.java",
+        "sizeBytes": 864,
+        "sha256": "6210a60187db4e117335a188c4539e2ff890fcfdccbe7b4d2ce5dc286158e73e"
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/CapeDownloadMixin.java",
@@ -89,9 +99,19 @@
         "sha256": "b8130247c1bffebf2f7381172d4dc533ac8325c7e2ae0f8bb0d43111dc250a58"
       },
       {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/LanGuestModeMixin.java",
+        "sizeBytes": 905,
+        "sha256": "5417e9a2bb5bfd6c239acb13eb84e16a75d14d50c05c58f634168c98eccf7b6f"
+      },
+      {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/LivingNameEffectsMixin.java",
         "sizeBytes": 813,
         "sha256": "c6dc302bd31dc80edd34439c92061af215010ccc5d90791c025ee9f6648f9cc0"
+      },
+      {
+        "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/NightmareAchievementDisplayMixin.java",
+        "sizeBytes": 845,
+        "sha256": "db5c91df6b54e2290c497061c3d4adecba93954462c7decb1b3bf35e2d98b9d0"
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/mixin/PlayerNameEffectsMixin.java",
@@ -105,18 +125,18 @@
       },
       {
         "path": "tools/legacy-bridge/src/main/resources/btw-lan-bridge.mixins.json",
-        "sizeBytes": 320,
-        "sha256": "630c82a38afdc92407cf93393acc713a246523accc47771c2140268b995719bb"
+        "sizeBytes": 423,
+        "sha256": "eb58628f1a5d608e8e11995427c74945d9e02a702cf1d0a211469147f83819f8"
       },
       {
         "path": "tools/legacy-bridge/src/main/resources/fabric.mod.json",
-        "sizeBytes": 563,
-        "sha256": "a0fb537764c1cab3c64b837cd89c05caacf45e5120f6b4c1edf3b7e21daa6538"
+        "sizeBytes": 609,
+        "sha256": "9ed22d51352724f6e78df0fb3f367c2c91472e6172cbc2878e66c362c6cda5ac"
       },
       {
         "path": "tools/legacy-bridge/src/test/java/org/lanminecraft/btwbridge/RegistryDataTest.java",
-        "sizeBytes": 4240,
-        "sha256": "45f1d6e11663a6a6b141627c12ab22c996369f00a8132749400256da16fb548e"
+        "sizeBytes": 5318,
+        "sha256": "18baf277d71e4871908a114b6e263aa897aa42e83cd8d57af3f63e022a2fad68"
       }
     ],
     "status": "reviewed-final"

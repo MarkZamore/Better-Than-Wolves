@@ -11,7 +11,7 @@ REVIEWED_JARS = {
     'minecraft-1.6.4-client.jar': 'f4513e51c766cdd1d32ca8acd0835d7e16e2851ebea3f2a3b4ce5ae696baf3ae',
     'mods/btwce-3.1.1.jar': 'ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d',
     'mods/Nightmare-Mode-1.1.6.jar': 'be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248',
-    'mods/btw-lan-bridge-1.0.0.jar': '814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172',
+    'mods/btw-lan-bridge-1.0.0.jar': '16765c1b038b23dccb64ca1f968a4116930e818aa520f5197f0eb94e6c47cb5a',
 }
 
 

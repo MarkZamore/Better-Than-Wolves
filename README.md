@@ -25,7 +25,7 @@ python -B tools/generate_manifest.py --pack . --out dist --verify-only
 
 ## Подготовка обновления автора
 
-Обязательный слой поставки определён в `tools/overlay.json`: runtime descriptor, явный `pack-owned`, [пресет управления](tools/keybinds/design.md) и технический bridge. `tools/overlay-receipt.json` связывает точный upstream lock, определение overlay и применённые операции. Bridge 1.0.0 принят в полном production клиенте `production-rename-09`; его SHA256 `814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172`, размер 18,996 байт. Его исходники и exact-SHA targets принадлежат сборке, а не лаунчеру.
+Обязательный слой поставки определён в `tools/overlay.json`: runtime descriptor, явный `pack-owned`, [пресет управления](tools/keybinds/design.md) и технический bridge. `tools/overlay-receipt.json` связывает точный upstream lock, определение overlay и применённые операции. Действующий bridge 1.0.0 имеет SHA256 `16765c1b038b23dccb64ca1f968a4116930e818aa520f5197f0eb94e6c47cb5a` и размер 23 334 байта. Он сохраняет выбранные имена в объявлениях о достижениях CE и Nightmare и наследует Creative для гостя при открытии Creative-мира. Для проверки через настоящий клиент использован независимый QA-мир; границы сетевой проверки указаны в `TESTING-STATUS.md`. Его исходники и exact-SHA targets принадлежат сборке, а не лаунчеру.
 
 Новый author-input задаётся отдельным явным upstream lock с официальными HTTPS-источниками, размерами и SHA256. Инструмент готовит только новый независимый candidate:
 

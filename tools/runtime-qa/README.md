@@ -51,6 +51,21 @@ settings. Exit uses the actual enabled pause-menu quit button and then normal
 game shutdown. A disabled Nightmare quit gate is respected and retried while
 the world runs. Reentry uses the native existing-world launch method.
 
+For the offline LAN UI probe, include the exact candidate e4steam and pack
+bridge JARs, set fixture `options.txt` to `lang:ru_RU`, and add
+`--property btw.qa.lanGuestMode=true` to a fresh native run. The actual
+create-world menu selects Creative. Use `--mode reenter` with that saved world
+to repeat the checks after shutdown. Supply a fixture-only legacy registry row
+and matching `--username` canonical name plus
+`minecraft.portable.identity.localPlayer` and `minecraft.portable.legacy.registry`
+properties. The transport still checks the normal local-owner and memory admission
+proof. The probe verifies Creative and Survival
+arguments at the native publication call and checks the Russian chat message
+and report notice through their real screens. It substitutes a dummy port,
+suppresses Steam bootstrap and changes the publish flag only for the report
+notice check. It exercises the transformed client without opening network
+listeners, contacting Steam or testing a real guest login.
+
 Extended probes add a server-tick dispatcher, counters in the real player/font
 renderers, and a forwarding observer at the native corpse-rotation call. These
 are QA instrumentation, not shipped transformations. Original GL calls and
