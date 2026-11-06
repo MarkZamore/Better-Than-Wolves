@@ -27,6 +27,7 @@ jobs:
       - name: Validate source and publication boundaries
         run: |
           python -B -m unittest discover -s tools -p 'test_*.py'
+          python -B tools/keybinds/check_preset.py
           python -B tools/restore_distribution.py --pack . --verify-only
       - name: Stage and verify every payload
         run: |

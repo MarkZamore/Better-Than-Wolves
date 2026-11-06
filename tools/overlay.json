@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packId": "better-than-wolves",
-  "purpose": "Preserve reviewed runtime descriptor, explicit config ownership and the identity/skin/title bridge across upstream preparation.",
+  "purpose": "Preserve the reviewed runtime descriptor, explicit config ownership, controls preset and identity/skin/title bridge across upstream preparation.",
   "reviewedBaseFiles": [
     {
       "path": "mods/btwce-3.1.1.jar",
@@ -24,6 +24,11 @@
       "path": "launcher/pack-owned.txt",
       "sizeBytes": 79,
       "sha256": "c68b46886599a0cc88afa3c850ead29619909a2631d076399298312bed67b492"
+    },
+    {
+      "path": "launcher/controls-preset.txt",
+      "sizeBytes": 414,
+      "sha256": "c2d3cfefa8b5ba131dc43ec327183f996d2986be6526905059d0d186e02e6704"
     }
   ],
   "bridge": {

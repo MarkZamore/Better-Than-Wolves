@@ -14,6 +14,7 @@ Better Than Wolves CE продолжает Better Than Wolves FlowerChild; ав�
 python -B tools/restore_distribution.py --pack .
 python -B tools/restore_distribution.py --pack . --verify-only
 python -B -m unittest discover -s tools -p "test_*.py"
+python -B tools/keybinds/check_preset.py
 python -B tools/generate_manifest.py --pack . --out dist --revision <full-commit-sha>
 python -B tools/generate_manifest.py --pack . --out dist --verify-only
 ```
@@ -24,7 +25,7 @@ python -B tools/generate_manifest.py --pack . --out dist --verify-only
 
 ## Подготовка обновления автора
 
-Обязательный слой поставки определён в `tools/overlay.json`: runtime descriptor, явный `pack-owned` и технический bridge. `tools/overlay-receipt.json` связывает точный upstream lock, определение overlay и применённые операции. Bridge 1.0.0 принят в полном production клиенте `production-rename-09`; его SHA256 `814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172`, размер 18,996 байт. Его исходники и exact-SHA targets принадлежат сборке, а не лаунчеру.
+Обязательный слой поставки определён в `tools/overlay.json`: runtime descriptor, явный `pack-owned`, [пресет управления](tools/keybinds/design.md) и технический bridge. `tools/overlay-receipt.json` связывает точный upstream lock, определение overlay и применённые операции. Bridge 1.0.0 принят в полном production клиенте `production-rename-09`; его SHA256 `814347ffd616bfad8405618528953936280457e87d162803a639bc407a618172`, размер 18,996 байт. Его исходники и exact-SHA targets принадлежат сборке, а не лаунчеру.
 
 Новый author-input задаётся отдельным явным upstream lock с официальными HTTPS-источниками, размерами и SHA256. Инструмент готовит только новый независимый candidate:
 

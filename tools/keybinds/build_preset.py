@@ -1,0 +1,39 @@
+"""Render the reviewed Minecraft 1.6.4 / Better Than Wolves controls preset."""
+
+from pathlib import Path
+
+PACK = Path(__file__).resolve().parents[2]
+PRESET = PACK / 'launcher/controls-preset.txt'
+
+# Legacy LWJGL 2 values, as serialized by the full client. Mouse buttons
+# use Mouse.getEventButton() - 100. Preserve the author's defaults.
+BINDINGS = {
+    'key_key.attack': -100,
+    'key_key.use': -99,
+    'key_key.forward': 17,
+    'key_key.left': 30,
+    'key_key.back': 31,
+    'key_key.right': 32,
+    'key_key.jump': 57,
+    'key_key.sneak': 42,
+    'key_key.drop': 16,
+    'key_key.inventory': 18,
+    'key_key.chat': 20,
+    'key_key.playerlist': 15,
+    'key_key.pickItem': -98,
+    'key_key.command': 53,
+    'key_key.special': 29,
+    'key_key.achievements': 38,
+    'key_key.nightmaremode.zoomhold': 46,
+    'key_key.nightmaremode.zoomtoggle': 47,
+}
+
+
+def render():
+    lines = ['# Better Than Wolves, Minecraft 1.6.4 (LWJGL 2).']
+    lines.extend(f'{name}:{value}' for name, value in BINDINGS.items())
+    return ('\n'.join(lines) + '\n').encode('utf-8')
+
+
+if __name__ == '__main__':
+    PRESET.write_bytes(render())

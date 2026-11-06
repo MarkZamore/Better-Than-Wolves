@@ -2,8 +2,13 @@
   "schemaVersion": 1,
   "packId": "better-than-wolves",
   "upstreamLockSha256": "eae54e75c66700485491494cc9590a2a495cce91fd9f30727c649c9c503cacc3",
-  "overlaySha256": "017ed998e932d4d5718c074484dcc5090d20e6e19fe4323be26f4c8162f12789",
+  "overlaySha256": "1445bde5ff5f41305d9cffc8a83a8603f9802f837cf907e99a8e8e91cd740b92",
   "operations": [
+    {
+      "path": "launcher/controls-preset.txt",
+      "sizeBytes": 414,
+      "sha256": "c2d3cfefa8b5ba131dc43ec327183f996d2986be6526905059d0d186e02e6704"
+    },
     {
       "path": "launcher/pack-owned.txt",
       "sizeBytes": 79,

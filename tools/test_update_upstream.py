@@ -17,6 +17,7 @@ class MandatoryOverlayUpdateTests(unittest.TestCase):
         (s/'library').mkdir(); (s/'launcher').mkdir()
         write_json(s/'portable-pack.json', {'schemaVersion': 1, 'minecraftVersion': '1.6.4', 'loader': {'type':'legacyfabric','version':'0.18.2'}, 'clientJar':'minecraft-1.6.4-client.jar','javaMajorVersion':17})
         (s/'launcher/pack-owned.txt').write_text('# explicit ownership stays unchanged\n')
+        (s/'launcher/controls-preset.txt').write_text('key_key.forward:17\n')
         mod(s/'mods/btwce-3.1.1.jar','btw','3.1.1'); mod(s/'mods/Nightmare-Mode-1.1.6.jar','nightmare','1.1.6'); mod(s/'mods/btw-lan-bridge-1.0.0.jar','btw_lan_bridge','1.0.0')
         (s/'minecraft-1.6.4-client.jar').write_bytes(b'synthetic-client')
         (s/'resources').mkdir(); (s/'resources/author-note.txt').write_bytes(b'original author content')
@@ -27,7 +28,7 @@ class MandatoryOverlayUpdateTests(unittest.TestCase):
         write_json(s/'library/mod-pages.json',{mid:'https://example.org/project/'+mid for mid in ('btw','nightmare','btw_lan_bridge')}); (s/'library/README.md').write_text('Synthetic fixture provenance'); (s/'library/preview.jpg').write_bytes(b'synthetic-preview')
         write_json(s/'tools/catalog-entry.json', {'id':'better-than-wolves','relativePath':'Better Than Wolves','source':{'owner':'MarkZamore','repo':'Better-Than-Wolves','tag':'pack-latest'}})
         overlay = {'schemaVersion':1,'packId':'better-than-wolves','reviewedBaseFiles':[{k:row[k] for k in ('path','sizeBytes','sha256')} for row in upstream['files'] if row['path'].startswith('mods/')],
-            'sourceFiles':[{'path':rel,**fingerprint(s/rel)} for rel in ('portable-pack.json','launcher/pack-owned.txt')],
+            'sourceFiles':[{'path':rel,**fingerprint(s/rel)} for rel in ('portable-pack.json','launcher/pack-owned.txt','launcher/controls-preset.txt')],
             'bridge':{'path':'mods/btw-lan-bridge-1.0.0.jar','modId':'btw_lan_bridge','builder':'tools/legacy-bridge/build_bridge.py','status':'pending-final-runtime-review'}}
         write_json(s/'tools/overlay.json',overlay); finalize_reviewed_overlay(s); freeze(s)
         self.original = {path.relative_to(s).as_posix():path.read_bytes() for path in s.rglob('*') if path.is_file()}
@@ -44,8 +45,8 @@ class MandatoryOverlayUpdateTests(unittest.TestCase):
         for row in upstream['files'][:-1]:
             target=incoming/row['path']; target.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(self.source/row['path'],target)
         out = self.root/'artifacts/candidate'; result = prepare_update(self.source,lock,out,incoming)
-        self.assertTrue(result['actualRuntimeNotPerformed']); self.assertEqual(3,result['mandatoryOverlayOperations'])
-        for rel in ('mods/btw-lan-bridge-1.0.0.jar','portable-pack.json','launcher/pack-owned.txt','mods/btwce-3.1.1.jar','mods/Nightmare-Mode-1.1.6.jar'):
+        self.assertTrue(result['actualRuntimeNotPerformed']); self.assertEqual(4,result['mandatoryOverlayOperations'])
+        for rel in ('mods/btw-lan-bridge-1.0.0.jar','portable-pack.json','launcher/pack-owned.txt','launcher/controls-preset.txt','mods/btwce-3.1.1.jar','mods/Nightmare-Mode-1.1.6.jar'):
             self.assertEqual(self.original[rel],(out/rel).read_bytes())
         self.assertEqual(b'reviewed new unrelated author content',(out/'resources/author-note.txt').read_bytes())
         self.assertEqual(self.original,{p.relative_to(self.source).as_posix():p.read_bytes() for p in self.source.rglob('*') if p.is_file()})

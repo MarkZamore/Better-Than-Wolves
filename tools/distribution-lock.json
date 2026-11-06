@@ -4,6 +4,11 @@
   "upstreamLockSha256": "eae54e75c66700485491494cc9590a2a495cce91fd9f30727c649c9c503cacc3",
   "files": [
     {
+      "path": "launcher/controls-preset.txt",
+      "sizeBytes": 414,
+      "sha256": "c2d3cfefa8b5ba131dc43ec327183f996d2986be6526905059d0d186e02e6704"
+    },
+    {
       "path": "launcher/pack-owned.txt",
       "sizeBytes": 79,
       "sha256": "c68b46886599a0cc88afa3c850ead29619909a2631d076399298312bed67b492"
