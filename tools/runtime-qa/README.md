@@ -121,6 +121,33 @@ removed; registry bytes are restored on completion or probe failure.
 
 ## Evidence boundaries
 
+For the final single-difficulty/Creative-command probe, first create an explicit
+offline synthetic identity in the owned fixture:
+
+```text
+python -B tools/runtime-qa/prepare_synthetic_identity.py <fixture>
+```
+
+Use its `nativeName` with `run_native.py --username`, and pass its registry path
+as `--property minecraft.portable.legacy.registry=...` and its `localUuid` as
+`--property minecraft.portable.identity.localPlayer=...`. Add
+`--property btw.qa.lanGuestMode=true --property btw.qa.hiddenWindow=true`.
+The hidden-window option uses an unshown non-focusable AWT parent, not desktop
+input automation. Only the isolated probe checks the single-difficulty policy;
+the two-author-JAR baseline keeps its authored defaults. The synthetic IDs are
+explicit fixture data, never existing people or authenticated Steam accounts.
+
+The same isolated probe observes native copy/invite/stop chat hit tests and
+command-result labels. Its fake hosting session and intercepted command sink
+never invoke Steam, clipboard actions or real invitations. Physical mouse clicks
+and real two-account gameplay remain separate acceptance cases.
+
+The probe also checks the live SoundSystem instance's `soundLibrary` backend,
+the native OpenAL context, and a readable `random.click` sound-pool URL. This
+does not claim audible output or diagnose another machine's OpenAL loader.
+`run_native.py` scopes home, temp and profile environment directories to the
+fixture for both Java compilation and the child game.
+
 Extended runs compare opaque pixels from the selected PNG with the real BTW
 decoded image, exercise classic/slim cache replacement and GPU texture-object
 invalidation, and render the registered no-cape path through the native

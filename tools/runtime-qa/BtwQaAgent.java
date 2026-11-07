@@ -247,15 +247,17 @@ public final class BtwQaAgent implements ClassFileTransformer {
                     method(create.getClass(),"method_914").invoke(create);
                     if(!world.equals(field(create.getClass(),"field_1096").get(create)))throw new SecurityException("Native save-folder mismatch");
                     method(create.getClass(),"method_1033").invoke(create);
-                    Field difficulty = field(create.getClass(), "difficultyID");
-                    Object difficultyButton = field(create.getClass(), "buttonDifficultyLevel").get(create);
-                    if (difficulty.getInt(create) != 2 || field(difficultyButton.getClass(), "field_1055").getBoolean(difficultyButton))
-                        throw new IllegalStateException("New worlds must offer only the selected Nightmare difficulty");
-                    Object beforeMode = field(create.getClass(), "field_1097").get(create);
-                    method(create.getClass(), "method_1027", Class.forName("net.minecraft.class_356",false,cl)).invoke(create,difficultyButton);
-                    if (difficulty.getInt(create) != 2 || !beforeMode.equals(field(create.getClass(), "field_1097").get(create)))
-                        throw new IllegalStateException("Difficulty action escaped the single choice or changed game mode");
-                    event("native_single_difficulty_verified", "difficultyIndex=2;selectorEnabled=false;gameModePreserved=true");
+                    if (lanModeProbe) {
+                        Field difficulty = field(create.getClass(), "difficultyID");
+                        Object difficultyButton = field(create.getClass(), "buttonDifficultyLevel").get(create);
+                        if (difficulty.getInt(create) != 2 || field(difficultyButton.getClass(), "field_1055").getBoolean(difficultyButton))
+                            throw new IllegalStateException("New worlds must offer only the selected Nightmare difficulty");
+                        Object beforeMode = field(create.getClass(), "field_1097").get(create);
+                        method(create.getClass(), "method_1027", Class.forName("net.minecraft.class_356",false,cl)).invoke(create,difficultyButton);
+                        if (difficulty.getInt(create) != 2 || !beforeMode.equals(field(create.getClass(), "field_1097").get(create)))
+                            throw new IllegalStateException("Difficulty action escaped the single choice or changed game mode");
+                        event("native_single_difficulty_verified", "difficultyIndex=2;selectorEnabled=false;gameModePreserved=true");
+                    }
                     if (lanModeProbe) {
                         Field selectedMode = field(create.getClass(), "field_1097");
                         for (int attempt = 0; attempt < 3 && !"creative".equals(selectedMode.get(create)); attempt++)
@@ -283,6 +285,7 @@ public final class BtwQaAgent implements ClassFileTransformer {
                     verifyGuestMode(client, cl);
                     verifyAchievementMixins(cl);
                     verifySharingChat(client, cl);
+                    verifyNativeAudio(client, cl);
                     lanModeObserved = true;
                 }
                 if(!skinObserved && worldTicks>=60 && !System.getProperty("minecraft.portable.skin.registry","").isBlank()) {
@@ -437,6 +440,22 @@ public final class BtwQaAgent implements ClassFileTransformer {
         event("native_guest_mode_verified", "worldMode=" + expectedMode + ";guestMode=" + lanProbeMode
             + ";commands=" + lanProbeCommands + ";authorControlsHidden=true;oneClickPause=true;networkSuppressedByQa=true");
         event("native_share_chat_verified", "locale=ru_RU;messageMatches=true;syntheticPort=25565");
+    }
+
+    private static void verifyNativeAudio(Object client, ClassLoader cl) throws Exception {
+        Object manager=field(client.getClass(),"field_3759").get(client);
+        Class<?> accessor=Class.forName("com.itlesports.nightmaremode.mixin.interfaces.SoundManagerAccess",false,cl);
+        Object system=accessor.getMethod("getSoundSystem").invoke(manager);
+        Object pool=accessor.getMethod("getSoundPoolSounds").invoke(manager);
+        Object backend=field(system.getClass(),"soundLibrary").get(system);
+        Class<?> library=backend==null?null:backend.getClass();
+        boolean created=(Boolean)Class.forName("org.lwjgl.openal.AL",false,cl).getMethod("isCreated").invoke(null);
+        Object click=method(pool.getClass(),"method_1721",String.class).invoke(pool,"random.click");
+        if(!created||library==null||!library.getName().contains("OpenAL")||click==null)
+            throw new IllegalStateException("Native OpenAL/click resource is unavailable: "+library+" / "+created);
+        java.net.URL url=(java.net.URL)method(click.getClass(),"method_5984").invoke(click);
+        try(java.io.InputStream input=url.openStream()) {if(input.read()<0)throw new IllegalStateException("Empty native click resource");}
+        event("native_audio_resource_verified","OpenALCreated=true;library="+library.getSimpleName()+";clickResourceReadable=true;urlProtocol="+url.getProtocol()+";audiblePlaybackNotClaimed=true");
     }
 
     private static void verifySharingChat(Object client, ClassLoader cl) throws Exception {

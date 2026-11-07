@@ -65,7 +65,8 @@ public final class InspectLegacyClient {
             Object manager=field(mc,"field_3759");
             Class<?> accessor=Class.forName("com.itlesports.nightmaremode.mixin.interfaces.SoundManagerAccess",false,loader);
             Object system=accessor.getMethod("getSoundSystem").invoke(manager);
-            text.append("AUDIO library=").append(system.getClass().getMethod("getLibraryType").invoke(system));
+            Object backend=field(system,"soundLibrary");
+            text.append("AUDIO library=").append(backend==null?null:backend.getClass().getName());
             text.append(" masterVolume=").append(system.getClass().getMethod("getMasterVolume").invoke(system)).append('\n');
             Object pool=accessor.getMethod("getSoundPoolSounds").invoke(manager);
             for(Field f:pool.getClass().getDeclaredFields())if(Map.class.isAssignableFrom(f.getType())) {

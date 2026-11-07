@@ -4,12 +4,14 @@ from pathlib import Path
 
 def build(fixture,jdk,asm=None):
     here=Path(__file__).resolve().parent;out=fixture/"instrumentation";out.mkdir(exist_ok=True)
+    tool_home=fixture/'profile';tool_temp=fixture/'temp'
+    tool_home.mkdir(exist_ok=True);tool_temp.mkdir(exist_ok=True)
     if asm is None:asm=next((fixture/"libraries/org/ow2/asm/asm").rglob("asm-*.jar"))
     jar=out/"btw-qa-agent.jar"
     with tempfile.TemporaryDirectory(prefix="qa-classes-",dir=out) as temporary:
         classes=Path(temporary).resolve()
         if not classes.is_relative_to(out.resolve()):raise ValueError("QA compilation escaped instrumentation folder")
-        subprocess.run([str(jdk/"bin/javac.exe"),"--release","17","-encoding","UTF-8","-g:none","-cp",str(asm),"-d",str(classes),str(here/"BtwQaAgent.java")],check=True)
+        subprocess.run([str(jdk/"bin/javac.exe"),'-J-Duser.home='+str(tool_home),'-J-Djava.io.tmpdir='+str(tool_temp),"--release","17","-encoding","UTF-8","-g:none","-cp",str(asm),"-d",str(classes),str(here/"BtwQaAgent.java")],check=True)
         with zipfile.ZipFile(jar,"w",compression=zipfile.ZIP_STORED) as z:
             def put(name,data):
                 info=zipfile.ZipInfo(name,(1980,1,1,0,0,0));info.create_system=3;info.external_attr=0o100644<<16;z.writestr(info,data)
@@ -30,6 +32,9 @@ def run(fixture, mode,label,jdk,timeout,properties=(),world="BtwQaBaseline",user
     args=[r["java"],"-Xms512M","-Xmx2048M","-Djava.library.path="+r["nativeDirectory"],"-Dorg.lwjgl.librarypath="+r["nativeDirectory"],"-Dfabric.gameJarPath="+str(fixture/"minecraft-1.6.4-client.jar"),"-Dbtw.qa.root="+str(fixture),"-Dbtw.qa.game="+r["game"],"-Dbtw.qa.evidence="+str(evidence),"-Dbtw.qa.world="+world,"-Dbtw.qa.mode="+mode]
     if publish:args.append("-Dbtw.qa.publish=true")
     if extended:args += ["-Dbtw.qa.dynamicSkin=true","-Dbtw.qa.discovery=true","-Dbtw.qa.rawTcpNegative=true","-Dbtw.qa.inventoryRender=true"]
+    qa_home=fixture/'profile';qa_temp=fixture/'temp'
+    for directory in (qa_home,qa_temp,qa_home/'AppData/Roaming',qa_home/'AppData/Local'):directory.mkdir(parents=True,exist_ok=True)
+    args += ['-Duser.home='+str(qa_home),'-Djava.io.tmpdir='+str(qa_temp),'-XX:ErrorFile='+str(evidence/'jvm-crash-%p.log')]
     for prop in properties:
         if "=" not in prop:raise ValueError("Property needs key=value")
         args.append("-D"+prop)
@@ -38,7 +43,10 @@ def run(fixture, mode,label,jdk,timeout,properties=(),world="BtwQaBaseline",user
     (evidence/"mod-inventory.json").write_text(json.dumps([{"file":p.name,"sizeBytes":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted((Path(r["game"])/"mods").glob("*.jar"))],indent=2))
     started=time.time()
     with (evidence/"stdout.log").open("wb") as stdout,(evidence/"stderr.log").open("wb") as stderr:
-        process=subprocess.Popen(args,cwd=r["game"],stdout=stdout,stderr=stderr)
+        environment=os.environ.copy()
+        environment.update(USERPROFILE=str(qa_home),HOME=str(qa_home),APPDATA=str(qa_home/'AppData/Roaming'),
+                           LOCALAPPDATA=str(qa_home/'AppData/Local'),TEMP=str(qa_temp),TMP=str(qa_temp))
+        process=subprocess.Popen(args,cwd=r["game"],stdout=stdout,stderr=stderr,env=environment)
         (evidence/"process.json").write_text(json.dumps({"pid":process.pid,"startedAtUnix":started}))
         try:code=process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
