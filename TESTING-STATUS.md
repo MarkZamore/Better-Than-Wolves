@@ -2,6 +2,18 @@
 
 Дата подготовки: 4 ноября 2026 года. Платформа: Minecraft Java 1.6.4 / Legacy Fabric 0.18.2 / Java 17; CE 3.1.1 / Nightmare Mode 1.1.6.
 
+## Проверка обновления 8 ноября 2026 года
+
+Bridge 1.0.0: 25 200 байт, SHA256 `04e3441753b061d6e426ef117fe50ccd8f07892740b04fd1a397b98de72e06e2`. Оба author JAR и вложенные библиотеки прежние; их exact-SHA guards действуют. `native-create-03`: настоящий клиент Java 17 / Legacy Fabric 0.18.2 создал новый изолированный Creative-мир, вошёл, сохранился и завершился exit 0 за 43,08 с. `native-reenter-04`: повторный вход/save/quit/exit 0 за 43,39 с с общим транспортом `0.3.4-lf164.3` SHA256 `8a80ab8542dc87c141c013ca4f27fd5a8b190f2d3110339813d20cee5e2069d1`.
+
+- PASS: новый мир предлагает только authored difficulty index 2, селектор выключен; прямое повторное действие не меняет сложность и режим игры. Creative выбирался штатной кнопкой. Native Share получил Creative/commands=true; контрольный Survival получил Survival/commands=false. Nightmare скрывает прежние кнопки; «Жалобы» и авторский quit gate сохранены.
+- PASS: native chat/font hit-test нового e4steam направил copy/invite/stop и отклонил старую строку сессии. Физическая мышь не использовалась; выполнение команд и Steam в этом fixture подавлены только QA-агентом. Настоящая `commands.tp.success` показала два зарегистрированных синтетических ника, сохранив исходные canonical arguments.
+- PASS: 30 проверок bridge; 15 фактических Loader records, 11 библиотечных mod ID. Снимок actual inventory снят по финальному повторному входу. Ранний кандидат неверного native symbol был отклонён Mixin guard; неверный профиль раннего стенда отклонён native-owner guard. Guards исправлены по точным symbols/синтетическому launch context, а не отключены.
+- ERROR baseline: восемь прежних SEVERE текстур, недоступность Realms/старого skins.minecraft.net. Fatal markers в успешных двух сеансах отсутствуют. Генератор GPU atlas завершён в штатном разрешении без собственных ограничений.
+- NOT RUN: два реальных Steam-участника на этой ревизии, приглашение/команды реального гостя, чужой скин на хосте и длительная слышимая проверка звука. Native fixture не выдаётся за такой PASS. Отчёт гостя с `Could not locate OpenAL library` сохраняется как отдельная незавершённая диагностика; исправная копия DLL на другом ПК её не закрывает.
+
+Read-only диагностика портала в активном клиенте по прямому запросу владельца нашла две рамы из `nmSpecialObsidian` ID 2308 (Arena Stone). Для Nether авторская проверка требует обычный/crude obsidian ID 49. Авторская механика портала не менялась; диагностический агент не регистрировал transformers и не менял мир. Инструменты находятся отдельно в `tools/diagnostics`, не в игровом payload.
+
 ## Проверенные входы
 
 Оба author JAR скачаны с официального Modrinth CDN по указанным пользователем версиям; официальные SHA512 совпали. CE primary `btwce-3.1.1.jar`: 48,017,821 байт, SHA256 `ef2b16a0183d810f3c9c526758fc56a2ef3ef540346d2e1cc442f7f9f892739d`. Nightmare `Nightmare-Mode-1.1.6.jar`: 12,053,870 байт, SHA256 `be8528a5e834faac4d999cfac9038a85f144500521ba9f8e4c19c035b941d248`. Официальный Minecraft client: 4,745,096 байт, SHA256 `f4513e51c766cdd1d32ca8acd0835d7e16e2851ebea3f2a3b4ce5ae696baf3ae`; Mojang SHA1 совпал.

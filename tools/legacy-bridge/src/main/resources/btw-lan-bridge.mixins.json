@@ -6,7 +6,7 @@
   "client": [
     "ClientLifecycleMixin", "ProfileLookupMixin", "CapeDownloadMixin", "CapeRenderMixin",
     "PlayerNameEffectsMixin", "LivingNameEffectsMixin", "LanGuestModeMixin",
-    "BtwAchievementDisplayMixin", "NightmareAchievementDisplayMixin"
+    "BtwAchievementDisplayMixin", "NightmareAchievementDisplayMixin", "WorldDifficultyMixin"
   ],
   "injectors": {"defaultRequire": 1}
 }

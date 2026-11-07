@@ -12,11 +12,13 @@ import org.objectweb.asm.*;
 public final class BtwQaAgent implements ClassFileTransformer {
     private static Path fixture, game, evidence;
     private static String world, mode;
+    private static java.awt.Frame hiddenParent;
     private static boolean lanModeProbe, lanModeObserved;
     private static int lanProbeCalls;
     private static String lanProbeMode;
     private static boolean lanProbeCommands;
     private static String lanProbeChat;
+    private static String sharingCommand;
     private static boolean busy, started, joined, leaving, ended, failed, published, publicationObserved, skinObserved, atlasObserved;
     private static int menuTicks, worldTicks, retryTicks;
     private static long joinedAt;
@@ -69,6 +71,7 @@ public final class BtwQaAgent implements ClassFileTransformer {
     }
 
     public byte[] transform(ClassLoader loader,String name,Class<?> type,ProtectionDomain domain,byte[] bytes) {
+        boolean hiddenDisplay = Boolean.getBoolean("btw.qa.hiddenWindow") && name.equals("org/lwjgl/opengl/Display");
         boolean render=name.equals("net/minecraft/class_570");
         boolean server=name.equals("net/minecraft/server/MinecraftServer");
         boolean font=name.equals("net/minecraft/class_370");
@@ -77,13 +80,22 @@ public final class BtwQaAgent implements ClassFileTransformer {
         boolean isolatedSteam = lanModeProbe && name.equals("link/e4steam/retro/RetroBootstrap");
         boolean observeChat = lanModeProbe && name.equals("net/minecraft/class_357");
         if(!name.equals("net/minecraft/class_1600")&&!render&&!server&&!font&&!living
-                &&!isolatedShare&&!isolatedSteam&&!observeChat)return null;
+                &&!isolatedShare&&!isolatedSteam&&!observeChat&&!hiddenDisplay)return null;
         try {
             ClassReader reader=new ClassReader(bytes);ClassWriter writer=new ClassWriter(reader,ClassWriter.COMPUTE_MAXS);
             final int[] count={0};
             reader.accept(new ClassVisitor(Opcodes.ASM9,writer){
                 public MethodVisitor visitMethod(int access,String n,String descriptor,String sig,String[] exceptions){
                     MethodVisitor target=super.visitMethod(access,n,descriptor,sig,exceptions);
+                    if (hiddenDisplay && n.equals("create") && descriptor.equals("(Lorg/lwjgl/opengl/PixelFormat;Lorg/lwjgl/opengl/Drawable;Lorg/lwjgl/opengl/ContextAttribs;)V")) {
+                        count[0]++;
+                        return new MethodVisitor(Opcodes.ASM9,target) {
+                            public void visitCode() {
+                                super.visitCode();super.visitLdcInsn(org.objectweb.asm.Type.getObjectType(name));
+                                super.visitMethodInsn(Opcodes.INVOKESTATIC,"BtwQaAgent","prepareHiddenDisplay","(Ljava/lang/Class;)V",false);
+                            }
+                        };
+                    }
                     if (isolatedShare && n.equals("method_3000")
                             && descriptor.equals("(Lnet/minecraft/class_1157;Z)Ljava/lang/String;")) {
                         // Observe the real native screen's transformed arguments without opening
@@ -108,6 +120,12 @@ public final class BtwQaAgent implements ClassFileTransformer {
                         target.visitMaxs(0, 0);
                         target.visitEnd();
                         return null;
+                    }
+                    if (isolatedSteam && n.equals("handleClientCommand") && descriptor.equals("(Ljava/lang/String;)Z")) {
+                        count[0]++;
+                        target.visitCode();target.visitVarInsn(Opcodes.ALOAD,0);
+                        target.visitMethodInsn(Opcodes.INVOKESTATIC,"BtwQaAgent","observeSharingCommand","(Ljava/lang/String;)Z",false);
+                        target.visitInsn(Opcodes.IRETURN);target.visitMaxs(0,0);target.visitEnd();return null;
                     }
                     if (observeChat && n.equals("method_898") && descriptor.equals("(Ljava/lang/String;)V")) {
                         count[0]++;
@@ -141,7 +159,7 @@ public final class BtwQaAgent implements ClassFileTransformer {
                     return target;
                 }
             },0);
-            if(count[0]!=(font?3:1))throw new IllegalStateException("Wrong native QA target count "+count[0]);
+            if(count[0]!=(font?3:isolatedSteam?2:1))throw new IllegalStateException("Wrong native QA target count "+count[0]);
             if (isolatedShare) event("native_guest_mode_observer_bound", "target=class_601.method_3000;networkSuppressedByQa=true");
             else if (isolatedSteam) event("native_steam_disabled_in_fixture", "transportMixinsLoaded=true;steamBootstrapSuppressedByQa=true");
             else if (observeChat) event("native_share_chat_observer_bound", "target=class_357.method_898");
@@ -150,6 +168,18 @@ public final class BtwQaAgent implements ClassFileTransformer {
         } catch(Throwable t){failure(t);throw new IllegalStateException(t);}
     }
     public static void renderSpecialsObserved(){renderSpecialsCalls++;}
+    public static void prepareHiddenDisplay(Class<?> display) {
+        if (hiddenParent != null) return;
+        try {
+            int width=(Integer)display.getMethod("getWidth").invoke(null);
+            int height=(Integer)display.getMethod("getHeight").invoke(null);
+            hiddenParent=new java.awt.Frame();hiddenParent.setUndecorated(true);hiddenParent.setFocusableWindowState(false);
+            java.awt.Canvas canvas=new java.awt.Canvas();canvas.setSize(width,height);hiddenParent.add(canvas);
+            hiddenParent.setSize(width,height);hiddenParent.addNotify();hiddenParent.validate();
+            display.getMethod("setParent",java.awt.Canvas.class).invoke(null,canvas);
+            event("native_hidden_display","unshownNonFocusableParent=true");
+        } catch(Exception failure) { throw new IllegalStateException(failure); }
+    }
     public static String observeLanShare(Object mode, boolean commands) {
         lanProbeCalls++;
         lanProbeMode = ((Enum<?>)mode).name();
@@ -157,6 +187,7 @@ public final class BtwQaAgent implements ClassFileTransformer {
         return "25565";
     }
     public static void observeShareChat(String line) { lanProbeChat = line; }
+    public static boolean observeSharingCommand(String command) { sharingCommand=command;return true; }
     public static void fontText(String text){if(capturingRowText&&text!=null)ROW_TEXT.add(text);}
     public static void earsObserved(){earCalls++;}
     public static void forwardRotate(float angle,float x,float y,float z){if(angle==180F&&x==0F&&y==0F&&z==1F)upsideDownCalls++;try{Class.forName("org.lwjgl.opengl.GL11",true,Thread.currentThread().getContextClassLoader()).getMethod("glRotatef",float.class,float.class,float.class,float.class).invoke(null,angle,x,y,z);}catch(Exception failure){throw new IllegalStateException(failure);}}
@@ -216,6 +247,15 @@ public final class BtwQaAgent implements ClassFileTransformer {
                     method(create.getClass(),"method_914").invoke(create);
                     if(!world.equals(field(create.getClass(),"field_1096").get(create)))throw new SecurityException("Native save-folder mismatch");
                     method(create.getClass(),"method_1033").invoke(create);
+                    Field difficulty = field(create.getClass(), "difficultyID");
+                    Object difficultyButton = field(create.getClass(), "buttonDifficultyLevel").get(create);
+                    if (difficulty.getInt(create) != 2 || field(difficultyButton.getClass(), "field_1055").getBoolean(difficultyButton))
+                        throw new IllegalStateException("New worlds must offer only the selected Nightmare difficulty");
+                    Object beforeMode = field(create.getClass(), "field_1097").get(create);
+                    method(create.getClass(), "method_1027", Class.forName("net.minecraft.class_356",false,cl)).invoke(create,difficultyButton);
+                    if (difficulty.getInt(create) != 2 || !beforeMode.equals(field(create.getClass(), "field_1097").get(create)))
+                        throw new IllegalStateException("Difficulty action escaped the single choice or changed game mode");
+                    event("native_single_difficulty_verified", "difficultyIndex=2;selectorEnabled=false;gameModePreserved=true");
                     if (lanModeProbe) {
                         Field selectedMode = field(create.getClass(), "field_1097");
                         for (int attempt = 0; attempt < 3 && !"creative".equals(selectedMode.get(create)); attempt++)
@@ -242,6 +282,7 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 if (lanModeProbe && !lanModeObserved && worldTicks >= 80) {
                     verifyGuestMode(client, cl);
                     verifyAchievementMixins(cl);
+                    verifySharingChat(client, cl);
                     lanModeObserved = true;
                 }
                 if(!skinObserved && worldTicks>=60 && !System.getProperty("minecraft.portable.skin.registry","").isBlank()) {
@@ -388,13 +429,76 @@ public final class BtwQaAgent implements ClassFileTransformer {
         int previousCalls = lanProbeCalls;
         lanProbeChat = null;
         click(pause, 7, true);
-        if (lanProbeCalls != previousCalls + 1 || !expectedMode.equals(lanProbeMode) || lanProbeCommands)
+        boolean expectedCommands = "CREATIVE".equals(expectedMode);
+        if (lanProbeCalls != previousCalls + 1 || !expectedMode.equals(lanProbeMode) || lanProbeCommands != expectedCommands)
             throw new IllegalStateException("Unexpected native LAN arguments: " + lanProbeMode + " / commands=" + lanProbeCommands);
         if (lanProbeChat == null || !lanProbeChat.replaceAll("§[0-9a-fk-or]", "").equals("Порт локального сервера: 25565"))
             throw new IllegalStateException("Unexpected native LAN success message: " + lanProbeChat);
         event("native_guest_mode_verified", "worldMode=" + expectedMode + ";guestMode=" + lanProbeMode
-            + ";commands=false;authorControlsHidden=true;oneClickPause=true;networkSuppressedByQa=true");
+            + ";commands=" + lanProbeCommands + ";authorControlsHidden=true;oneClickPause=true;networkSuppressedByQa=true");
         event("native_share_chat_verified", "locale=ru_RU;messageMatches=true;syntheticPort=25565");
+    }
+
+    private static void verifySharingChat(Object client, ClassLoader cl) throws Exception {
+        Class<?> gui=Class.forName("net.minecraft.class_388",false,cl);
+        Object parent=field(client.getClass(),"field_3816").get(client);
+        Object screen=Class.forName("net.minecraft.class_359",true,cl).getConstructor().newInstance();
+        Method show=method(client.getClass(),"method_2928",gui);
+        Class<?> entry=Class.forName("link.e4steam.E4steamClient",true,cl);
+        Field current=field(entry,"session");Object original=current.get(null);
+        Class<?> access=Class.forName("link.e4steam.steam.SteamAccessMode",true,cl);
+        Object friends=access.getMethod("valueOf",String.class).invoke(null,"FRIENDS_ONLY");
+        Class<?> sessionClass=Class.forName("link.e4steam.steam.SteamSession",true,cl);
+        Object fake=sessionClass.getConstructor(int.class,access).newInstance(25565,friends);
+        Field state=field(sessionClass,"state");
+        state.set(fake,state.getType().getMethod("valueOf",String.class).invoke(null,"STARTED"));
+        Class<?> controls=Class.forName("link.e4steam.legacy164.LegacySharingChat",true,cl);
+        Method click=controls.getMethod("clickAt",int.class,int.class,int.class);
+        try {
+            current.set(null,fake);show.invoke(client,screen);
+            controls.getMethod("show",String.class).invoke(null,"s-qa-synthetic.steam");
+            Object chat=method(field(client.getClass(),"field_3820").get(client).getClass(),"method_983").invoke(field(client.getClass(),"field_3820").get(client));
+            Object font=field(client.getClass(),"field_3814").get(client);
+            Object settings=field(client.getClass(),"field_3823").get(client);
+            Class<?> resolution=Class.forName("net.minecraft.class_389",true,cl);
+            Object scaleObject=resolution.getConstructor(settings.getClass(),int.class,int.class).newInstance(settings,
+                field(client.getClass(),"field_3801").getInt(client),field(client.getClass(),"field_3802").getInt(client));
+            int scale=(Integer)method(resolution,"method_1049").invoke(scaleObject);
+            float chatScale=(Float)method(chat.getClass(),"method_4938").invoke(chat);
+            int fontHeight=field(font.getClass(),"field_1141").getInt(font);
+            List<?> lines=(List<?>)field(chat.getClass(),"field_5713").get(chat);
+            int stopX=0,stopY=0,checked=0;
+            String[] labels={"s-qa-synthetic.steam","[Пригласить друзей Steam]","[Закрыть доступ]"};
+            String[] commands={"/e4steam copy","/e4steam invite","/e4steam stop"};
+            for(int action=0;action<labels.length;action++) {
+                boolean found=false;
+                for(int lineIndex=0;lineIndex<lines.size();lineIndex++) {
+                    Object line=lines.get(lineIndex);
+                    String plain=((String)method(line.getClass(),"method_834").invoke(line)).replaceAll("§.","");
+                    int at=plain.indexOf(labels[action]);if(at<0)continue;
+                    int pixels=(Integer)method(font.getClass(),"method_954",String.class).invoke(font,plain.substring(0,at));
+                    int x=Math.round((pixels*chatScale+3)*scale)+scale;
+                    int y=Math.round(((lineIndex*(fontHeight+1)+fontHeight/2f)*chatScale+25)*scale);
+                    sharingCommand=null;
+                    if(!(Boolean)click.invoke(null,x,y,0)||!commands[action].equals(sharingCommand))
+                        throw new IllegalStateException("Native sharing hit-test failed for "+commands[action]+": "+sharingCommand);
+                    if(action==2){stopX=x;stopY=y;}found=true;checked++;break;
+                }
+                if(!found)throw new IllegalStateException("Native sharing label missing: "+labels[action]);
+            }
+            current.set(null,null);sharingCommand=null;
+            if((Boolean)click.invoke(null,stopX,stopY,0)||sharingCommand!=null)
+                throw new IllegalStateException("A stale sharing line dispatched a command");
+            event("native_sharing_controls_verified","nativeFontAndWrap=true;copyInviteStop="+checked+";staleRejected=true;commandsSuppressedByQa=true;physicalMouseNotUsed=true");
+            Class<?> component=Class.forName("net.minecraft.class_1687",true,cl);
+            Object[] arguments={"s0000000000001","s0000000000002"};
+            Object message=component.getMethod("method_6020",String.class,Object[].class).invoke(null,"commands.tp.success",arguments);
+            String rendered=(String)component.getMethod("method_6015",boolean.class).invoke(message,false);
+            if(!rendered.contains("QaHost")||!rendered.contains("QaGuest")||rendered.contains("s000000000000"))
+                throw new IllegalStateException("Native command translation lost display names: "+rendered);
+            if(!arguments[0].equals("s0000000000001"))throw new IllegalStateException("Command arguments were mutated");
+            event("native_command_names_verified","translation=commands.tp.success;twoRegisteredLabels=true;canonicalArgumentsPreserved=true");
+        } finally {current.set(null,original);show.invoke(client,parent);}
     }
 
     private static void verifyReportsNotice(Object client, ClassLoader cl, Object server) throws Exception {

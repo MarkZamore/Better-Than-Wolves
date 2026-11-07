@@ -4,7 +4,7 @@ This is test infrastructure, never pack payload. Existing installations are only
 read as content-addressed caches; no personal instance or world is opened.
 """
 from __future__ import annotations
-import argparse, concurrent.futures, hashlib, json, os, shutil, time, urllib.request, zipfile
+import argparse, concurrent.futures, hashlib, json, os, shutil, threading, time, urllib.request, zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -99,9 +99,11 @@ def prepare(source, fixture, java, caches):
         if not target.exists():shutil.copyfile(p,target)
     ai=base["assetIndex"];index=fetch(ai["url"],fixture/"assets/indexes/legacy.json",ai["sha1"],ai["size"])
     objects=json.loads(index.read_text())["objects"]
+    asset_locks = {record['hash']: threading.Lock() for record in objects.values()}
     def one(item):
         name,record=item;h=record["hash"];rel=f"objects/{h[:2]}/{h}"
-        p=fetch(f"https://resources.download.minecraft.net/{h[:2]}/{h}",fixture/"assets"/rel,h,record["size"],[c/"assets"/rel for c in caches])
+        with asset_locks[h]:
+            p=fetch(f"https://resources.download.minecraft.net/{h[:2]}/{h}",fixture/"assets"/rel,h,record["size"],[c/"assets"/rel for c in caches])
         v=fixture/"assets/virtual/legacy"/name;v.parent.mkdir(parents=True,exist_ok=True)
         if not v.exists():
             try:os.link(p,v)

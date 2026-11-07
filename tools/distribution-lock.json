@@ -25,8 +25,8 @@
     },
     {
       "path": "mods/btw-lan-bridge-1.0.0.jar",
-      "sizeBytes": 23334,
-      "sha256": "16765c1b038b23dccb64ca1f968a4116930e818aa520f5197f0eb94e6c47cb5a"
+      "sizeBytes": 25200,
+      "sha256": "04e3441753b061d6e426ef117fe50ccd8f07892740b04fd1a397b98de72e06e2"
     },
     {
       "path": "mods/btwce-3.1.1.jar",
@@ -42,8 +42,8 @@
   "supportFiles": [
     {
       "path": "library/content.json",
-      "sizeBytes": 1211,
-      "sha256": "4ca6ecc407faa7a30925c969a9a3082b226da038421710939b2dcc1bdc64f698"
+      "sizeBytes": 1471,
+      "sha256": "33ddbd1214afb5cf766fd3a3299145bc1a7237cdf9e4a5b8525c9cadda780fd1"
     },
     {
       "path": "library/mod-pages.json",
@@ -67,8 +67,8 @@
     },
     {
       "path": "library/loaded-mods.json",
-      "sizeBytes": 2473,
-      "sha256": "b3637a69d1be703adb52499eafe387963b93528536062e803a007036844263ab"
+      "sizeBytes": 2470,
+      "sha256": "c5cd4ce127dd4b4ab335949bea02e4c350a7d6ae9fdb1967db90bf4f00c9dbc6"
     }
   ]
 }

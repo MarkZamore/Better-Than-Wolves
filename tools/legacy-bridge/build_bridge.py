@@ -24,7 +24,7 @@ def digest(path: Path) -> str:
         return hashlib.file_digest(source, "sha256").hexdigest()
 
 def build(pack: Path) -> Path:
-    artifacts = ROOT / "artifacts"
+    artifacts = Path(os.environ.get("BTW_BRIDGE_ARTIFACTS", str(ROOT / "artifacts"))).resolve()
     deps, classes = artifacts / "deps", artifacts / "classes"
     deps.mkdir(parents=True, exist_ok=True)
     java_home = os.environ.get("JAVA_HOME", "")

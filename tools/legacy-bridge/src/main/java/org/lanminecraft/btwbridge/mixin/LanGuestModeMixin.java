@@ -13,7 +13,8 @@ public abstract class LanGuestModeMixin {
         require = 1, allow = 1, remap = false)
     private void inheritCreativeGuestMode(Args args) {
         Object selectedMode = args.get(0);
-        Object guestMode = LanGuestMode.forShare(selectedMode, args.<Boolean>get(1));
-        if (guestMode != selectedMode) args.set(0, guestMode);
+        LanGuestMode.Share share = LanGuestMode.forShare(selectedMode, args.<Boolean>get(1));
+        args.set(0, share.mode());
+        args.set(1, share.commandsAllowed());
     }
 }
