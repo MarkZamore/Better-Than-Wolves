@@ -41,9 +41,29 @@
   ],
   "supportFiles": [
     {
+      "path": ".github/workflows/publish.yml",
+      "sizeBytes": 4374,
+      "sha256": "06a7e2a5815ff3328c286d39ffd72f462d5e110e42e451e82e4062c0490e2f8a"
+    },
+    {
+      "path": "AGENTS.md",
+      "sizeBytes": 5517,
+      "sha256": "5ca169a451934c93b6ac7a2387b98e928fa9084464347adaeb4ca4b0481a5b4b"
+    },
+    {
+      "path": "library/README.md",
+      "sizeBytes": 6408,
+      "sha256": "bc91cab54b4dd43ce7123b3cb89a0d6941f31c768030cad97ee198553b2f9e1c"
+    },
+    {
       "path": "library/content.json",
       "sizeBytes": 1471,
       "sha256": "33ddbd1214afb5cf766fd3a3299145bc1a7237cdf9e4a5b8525c9cadda780fd1"
+    },
+    {
+      "path": "library/loaded-mods.json",
+      "sizeBytes": 2470,
+      "sha256": "c5cd4ce127dd4b4ab335949bea02e4c350a7d6ae9fdb1967db90bf4f00c9dbc6"
     },
     {
       "path": "library/mod-pages.json",
@@ -56,19 +76,24 @@
       "sha256": "c639f34d7e240728f4e50b0fc7731f8285bc3b431a0699ae069a5c4f276cfd0f"
     },
     {
-      "path": "library/README.md",
-      "sizeBytes": 6408,
-      "sha256": "bc91cab54b4dd43ce7123b3cb89a0d6941f31c768030cad97ee198553b2f9e1c"
-    },
-    {
       "path": "library/runtime-sources.json",
       "sizeBytes": 382,
       "sha256": "581dae94e220d41d584554bbc562b6bc75df27ed577b42c7d2724b6851ad3db8"
     },
     {
-      "path": "library/loaded-mods.json",
-      "sizeBytes": 2470,
-      "sha256": "c5cd4ce127dd4b4ab335949bea02e4c350a7d6ae9fdb1967db90bf4f00c9dbc6"
+      "path": "tools/public-server-policy-proof.json",
+      "sizeBytes": 503,
+      "sha256": "2993da84c4624c84b82b91bfad0ad270626bfff485012fe6c8914fb12b2ee653"
+    },
+    {
+      "path": "tools/public-server-policy.json",
+      "sizeBytes": 818,
+      "sha256": "acca22934ad792ef01d72f1d2048fd2111700eaeaf8e15e64d89a935675716fd"
+    },
+    {
+      "path": "tools/public_server_policy.py",
+      "sizeBytes": 3881,
+      "sha256": "59782a6263b2a6bf06a0458a601ad69242b5ebc3247f2cfa0fafe945f6631254"
     }
   ]
 }

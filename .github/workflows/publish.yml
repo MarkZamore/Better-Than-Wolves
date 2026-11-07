@@ -35,6 +35,9 @@ jobs:
           python -B tools/generate_manifest.py --pack . --out dist --verify-only
       - name: Fresh download of the compatible public launcher and all deltas
         run: python -B tools/verify_launcher_delivery.py --out artifacts/public-launcher --minimum-release 445
+      - name: Require reviewed Steam-only automatic server lists
+        run: python tools/public_server_policy.py --pack . --manifest dist/pack-manifest.json
+
       - name: Publish all payloads before authoritative manifest
         env:
           GH_TOKEN: ${{ github.token }}
