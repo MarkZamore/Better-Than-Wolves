@@ -2,8 +2,8 @@
   "id": "better-than-wolves",
   "relativePath": "Better Than Wolves",
   "name": "Better Than Wolves",
-  "summary": "Суровое выживание, механическая автоматизация и испытания Nightmare Mode.",
-  "description": "Better Than Wolves: Community Edition меняет привычное развитие Minecraft: добывай ресурсы, осваивай ремёсла и строй механизмы с ветряными мельницами, водяными колёсами и передачей механической энергии. Аддон Nightmare Mode усложняет выживание, меняет противников и добавляет кровавые луны. Сборка использует Minecraft 1.6.4, Better Than Wolves CE 3.1.1 и Nightmare Mode 1.1.6 с авторскими механиками и настройками.",
+  "summary": "Суровое выживание, где каждый шаг развития приходится заслужить.",
+  "description": "Приготовься к выживанию, в котором привычные действия требуют новых знаний и осторожности. Добывай пищу, осваивай ремёсла и строй надёжное убежище, постепенно расширяя свои возможности. Ночи становятся серьёзным испытанием, а кровавые луны делают встречи с противниками ещё опаснее. Со временем используй ветер, воду и передачу движения, чтобы создавать механизмы и облегчать тяжёлую работу. Это сборка для тех, кому нравится разбираться в сложных правилах и радоваться каждому заслуженному улучшению.",
   "parents": { "nightmare": "btw" },
   "libraryIds": ["grossfabrichacks", "net_bytebuddy_byte-buddy-agent", "net_auoeke_reflect", "net_auoeke_unsafe", "org_apache_logging_log4j_log4j-core", "org_apache_logging_log4j_log4j-api", "com_typesafe_config", "btw_lan_bridge", "mixinextras"]
 }
