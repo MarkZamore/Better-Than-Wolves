@@ -63,7 +63,7 @@ Workflow восстанавливает и проверяет закреплён
 Обе проверки доступны вручную при подходящем соединении:
 
 ```text
-python -B tools/verify_launcher_delivery.py --out artifacts/launcher-public-<revision> --minimum-release 445
+python -B tools/verify_launcher_delivery.py --out artifacts/launcher-public-<revision> --minimum-release 483
 python -B tools/verify_published.py --pack . --out artifacts/public-<revision> --revision <full-commit-sha>
 ```
 

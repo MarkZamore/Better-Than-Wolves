@@ -22,6 +22,19 @@ LANMinecraft для исправления общего наследования
 публичного download proof лаунчера не ниже 483 перед своим manifest. Это
 поставка общего исправления, не новый GUI/два Steam-пользователя PASS этого QA.
 
+Итоговый выпуск pack-latest `bb248a8b8ecd18366ca3c99fa013dbe2b2b9ad3d`
+прошёл [pipeline 42481878111](https://github.com/MarkZamore/Better-Than-Wolves/actions/runs/42481878111).
+Полностью скачаны/сверены EXE и дельты launcher483 (159343454 байт), затем все
+8 pack assets (64879360 байт), 7 active files/11 mod rows; payload перед manifest.
+Manifest SHA256 `2cf899908c635be6d3e6f80fa100263cb0a7b71a1aa63f0fc28b1b7c77ea6060`.
+Bounded delivery artifact 38683 байта скачан отдельно, проверены hashes его
+вложенных proof files; live GitHub API подтвердил точный состав assets/digests.
+Начальный publish корректно остановил guard изменённого workflow supportSHA;
+пересмотрен только этот pin, остальные support/content pins сохранены.
+Новая диагностика хоста воспроизводима, а native загрузка OpenAL на госте и
+два реальных Steam-участника V4 остаются NOT RUN по решению пользователя
+публиковать без ожидания дальнейшего гостевого отчёта.
+
 Новый воспроизводимый native audio probe сравнил один состав Java17 / LF0.18.2 /
 CE3.1.1 / NM1.1.6 / bridge `04e344…` с аргументом `--assetsDir` и без него.
 Оба процесса штатно завершились, миры не открывались. Отрицательный контроль:
