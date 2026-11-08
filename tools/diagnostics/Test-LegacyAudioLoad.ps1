@@ -135,7 +135,8 @@ public final class InstalledAudioLoadProbe {
   try { AL.create();System.out.println("OpenALCreated="+AL.isCreated());
    System.out.println("Vendor="+AL10.alGetString(AL10.AL_VENDOR));
    System.out.println("Renderer="+AL10.alGetString(AL10.AL_RENDERER));
-   System.out.println("Device="+ALC10.alcGetString(AL.getDevice(),0x1013));
+   try {System.out.println("Device="+ALC10.alcGetString(AL.getDevice(),0x1013));}
+   catch(RuntimeException warning){System.out.println("OptionalDeviceNameWarning="+warning);}
   } finally {AL.destroy();}
  }
 }

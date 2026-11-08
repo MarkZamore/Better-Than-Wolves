@@ -45,3 +45,25 @@ installs libraries, plays sounds, changes devices, or edits worlds.
 tree, with no microphone or desktop-wide fallback. Its positive tone control is
 synthetic; the native game comparison lives in `../runtime-qa/run_audio_probe.py`.
 PCM measurements establish rendered signals, not physical headphone listening.
+
+## Confirmed Windows path encoding issue
+
+On 8 November the guest supplied a complete native-loader log: all installed
+hashes match, the native folder is only 107 characters, and Unicode
+`LoadLibraryExW` succeeds, while LWJGL reports error 126 for the same path under
+`C:\Users\<user>\Desktop\Майнкруфт`. Renaming the application folder to an ASCII
+name restored actual guest sound (user-confirmed; no DLL/settings changes).
+
+The exact `.17` [Windows loader](https://github.com/Legacy-Fabric/lwjgl/blob/a2e2ecbebd9102e7d4d178ac405b75bf62bc6fa9/lwjgl-platform/src/windows/c/windows/windows_al.c#L51)
+uses ANSI `LoadLibrary`; its [string conversion](https://github.com/Legacy-Fabric/lwjgl/blob/a2e2ecbebd9102e7d4d178ac405b75bf62bc6fa9/lwjgl-platform/src/common/c/common/common_tools.c#L171)
+uses Java's default charset. Forced `file.encoding=UTF-8` conflicts with Windows
+ACP1251 for Cyrillic paths. Do not globally change the text encoding or silently
+replace native libraries to work around this.
+
+`reproduce_openal_path.py --help` runs a bounded, marked fixture with exact
+installed Java/LWJGL/two DLLs and no PCM. It compares ASCII/Cyrillic paths,
+default/UTF8/Cp1251, and Unicode-safe `System.load` preloading. The isolated
+child-classloader case approximates separation from the system loader; it is not
+a real Knot/full-client PASS. Optional device-name decoding errors are reported
+separately from successful `AL.create`, because old native device strings can
+also conflict with UTF8 decoding.
