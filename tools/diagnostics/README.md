@@ -30,11 +30,16 @@ native directory. It does not extract an alternative DLL, play audio, or change
 device preferences. A guest report lacking this inventory cannot establish the
 cause of `Could not locate OpenAL library`.
 
-For a player, place `Run-AudioCheck.cmd` and `Test-LegacyAudioLoad.ps1` beside
-`LANMinecraft.exe` and run the CMD file. It uses the launcher's portable
-PowerShell 7 when present, otherwise an installed `pwsh`, and prints the path to
-`audio-load.json`. The optional two arguments are an explicit launcher root and
-fresh output directory. No script downloads/installs libraries or edits worlds.
+For a player, extract BOTH `Run-AudioCheck.cmd` and `Test-LegacyAudioLoad.ps1`
+beside `LANMinecraft.exe`, then run the CMD file. The checker uses built-in
+Windows PowerShell 5.1 (64-bit even from a 32-bit shell); no PowerShell download
+is needed. Command-line use under PowerShell 7 remains supported. Every startup
+path saves `AudioCheck-start.log` beside the CMD and a double-clicked window
+waits for a key even on a missing script/launcher error. Send that one log first;
+it includes the detailed diagnostic output or the startup failure. The optional
+two arguments are an explicit launcher root and fresh output directory; explicit
+root mode skips the interactive pause for automation. No script downloads or
+installs libraries, plays sounds, changes devices, or edits worlds.
 
 [AudioCapture](AudioCapture/README.md) captures only a marked QA Java process
 tree, with no microphone or desktop-wide fallback. Its positive tone control is
