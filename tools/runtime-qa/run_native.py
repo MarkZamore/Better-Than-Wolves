@@ -19,7 +19,7 @@ def build(fixture,jdk,asm=None):
             for p in sorted(classes.glob("*.class")):put(p.name,p.read_bytes())
     return jar
 
-def run(fixture, mode,label,jdk,timeout,properties=(),world="BtwQaBaseline",username="BtwQaHost",publish=False,context=None,extended=False):
+def run(fixture, mode,label,jdk,timeout,properties=(),world="BtwQaBaseline",username="BtwQaHost",publish=False,context=None,extended=False,omit_assets_dir=False):
     fixture=fixture.resolve();r=json.loads((fixture/"runtime.json").read_text());evidence=fixture/"evidence"/label
     if evidence.exists():raise ValueError("Use new evidence label")
     evidence.mkdir(parents=True);agent=build(fixture,jdk)
@@ -38,7 +38,9 @@ def run(fixture, mode,label,jdk,timeout,properties=(),world="BtwQaBaseline",user
     for prop in properties:
         if "=" not in prop:raise ValueError("Property needs key=value")
         args.append("-D"+prop)
-    args += ["-javaagent:"+str(agent),"-cp",os.pathsep.join(r["classpath"]+[str(fixture/"minecraft-1.6.4-client.jar")]),r["mainClass"],"--username",username,"--session","0","--version","1.6.4","--gameDir",r["game"],"--assetsDir",r["assetsDirectory"],"--width","854","--height","480"]
+    args += ["-javaagent:"+str(agent),"-cp",os.pathsep.join(r["classpath"]+[str(fixture/"minecraft-1.6.4-client.jar")]),r["mainClass"],"--username",username,"--session","0","--version","1.6.4","--gameDir",r["game"]]
+    if not omit_assets_dir:args += ["--assetsDir",r["assetsDirectory"]]
+    args += ["--width","854","--height","480"]
     (evidence/"launch-private.json").write_text(json.dumps({"arguments":args,"purpose":"Native lifecycle fixture; actual component hashes recorded separately"},indent=2))
     (evidence/"mod-inventory.json").write_text(json.dumps([{"file":p.name,"sizeBytes":p.stat().st_size,"sha256":hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted((Path(r["game"])/"mods").glob("*.jar"))],indent=2))
     started=time.time()
@@ -58,4 +60,4 @@ def run(fixture, mode,label,jdk,timeout,properties=(),world="BtwQaBaseline",user
     return code
 
 if __name__=="__main__":
-    p=argparse.ArgumentParser();p.add_argument("fixture",type=Path);p.add_argument("--mode",choices=["fresh","reenter"],required=True);p.add_argument("--label",required=True);p.add_argument("--jdk",type=Path,required=True);p.add_argument("--timeout",type=int,default=900);p.add_argument("--property",action="append",default=[]);p.add_argument("--world",default="BtwQaBaseline");p.add_argument("--username",default="BtwQaHost");p.add_argument("--publish",action="store_true");p.add_argument("--context",type=Path);p.add_argument("--extended",action="store_true");a=p.parse_args();raise SystemExit(run(a.fixture,a.mode,a.label,a.jdk,a.timeout,a.property,a.world,a.username,a.publish,a.context,a.extended))
+    p=argparse.ArgumentParser();p.add_argument("fixture",type=Path);p.add_argument("--mode",choices=["fresh","reenter"],required=True);p.add_argument("--label",required=True);p.add_argument("--jdk",type=Path,required=True);p.add_argument("--timeout",type=int,default=900);p.add_argument("--property",action="append",default=[]);p.add_argument("--world",default="BtwQaBaseline");p.add_argument("--username",default="BtwQaHost");p.add_argument("--publish",action="store_true");p.add_argument("--context",type=Path);p.add_argument("--extended",action="store_true");p.add_argument("--omit-assets-dir",action="store_true",help="Negative control: reproduce native default asset path");a=p.parse_args();raise SystemExit(run(a.fixture,a.mode,a.label,a.jdk,a.timeout,a.property,a.world,a.username,a.publish,a.context,a.extended,a.omit_assets_dir))

@@ -21,6 +21,10 @@ public final class BtwQaAgent implements ClassFileTransformer {
     private static String sharingCommand;
     private static boolean busy, started, joined, leaving, ended, failed, published, publicationObserved, skinObserved, atlasObserved;
     private static int menuTicks, worldTicks, retryTicks;
+    private static long audioReadyAt, audioStartedAt;
+    private static int audioSoundIndex;
+    private static boolean audioMusicStarted;
+    private static float audioOriginalMusic=-1;
     private static long joinedAt;
     private static Object discoveryParent, discoveryScreen, oldSkinTexture;
     private static int discoveryTicks, dynamicStage, dynamicStarted, cleanupTicks;
@@ -210,6 +214,11 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 method(client.getClass(),"method_2928",Class.forName("net.minecraft.class_388",false,cl)).invoke(client,pause);
                 if(click(pause,1,false))event("failed_probe_native_quit_requested","authorPauseMenuGateRespected=true");
                 else{method(client.getClass(),"method_2928",Class.forName("net.minecraft.class_388",false,cl)).invoke(client,new Object[]{null});retryTicks=100;}
+                return;
+            }
+            if(Boolean.getBoolean("btw.qa.audioProbe")) {
+                if(actualWorld!=null)throw new SecurityException("Audio-only probe must never open a world");
+                if(screen!=null&&screen.getClass().getName().equals("net.minecraft.class_624"))audioProbe(client,cl);
                 return;
             }
             if(discoveryScreen!=null) {
@@ -517,7 +526,62 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 throw new IllegalStateException("Native command translation lost display names: "+rendered);
             if(!arguments[0].equals("s0000000000001"))throw new IllegalStateException("Command arguments were mutated");
             event("native_command_names_verified","translation=commands.tp.success;twoRegisteredLabels=true;canonicalArgumentsPreserved=true");
+            Object body=component.getMethod("method_6020",String.class,Object[].class).invoke(null,"commands.gamemode.success.self",new Object[]{"Creative Mode"});
+            Object[] adminArguments={"s0000000000001",body};
+            Object admin=component.getMethod("method_6020",String.class,Object[].class).invoke(null,"chat.type.admin",adminArguments);
+            String adminText=((String)component.getMethod("method_6015",boolean.class).invoke(admin,false)).replaceAll("§.","");
+            if(!adminText.startsWith("[QaHost:")||adminText.contains("s0000000000001")||!adminArguments[0].equals("s0000000000001")||adminArguments[1]!=body)
+                throw new IllegalStateException("Native admin feedback lost display name or canonical arguments: "+adminText);
+            event("native_admin_name_verified","translation=chat.type.admin;registeredSenderDisplayed=true;nestedBodyAndCanonicalArgumentsPreserved=true");
         } finally {current.set(null,original);show.invoke(client,parent);}
+    }
+
+    private static void audioProbe(Object client,ClassLoader cl)throws Exception {
+        if(Files.isRegularFile(evidence.resolve("stop.flag"))){ended=true;method(client.getClass(),"method_2949").invoke(client);event("native_audio_probe_stop","normalGameShutdown=true");return;}
+        String[] sounds={"random.click","step.grass","step.stone","step.sand","mob.zombie.say","ambient.weather.rain"};
+        Object manager=field(client.getClass(),"field_3759").get(client);
+        Class<?> accessor=Class.forName("com.itlesports.nightmaremode.mixin.interfaces.SoundManagerAccess",false,cl);
+        Object pool=accessor.getMethod("getSoundPoolSounds").invoke(manager);
+        if(audioReadyAt==0){
+            Map<?,?> entries=null;
+            for(Field f:pool.getClass().getDeclaredFields())if(Map.class.isAssignableFrom(f.getType())){f.setAccessible(true);entries=(Map<?,?>)f.get(pool);break;}
+            if(entries==null)throw new IllegalStateException("Native sound pool map missing");
+            List<String> rows=new ArrayList<>();
+            for(String name:sounds){Object value=entries.get(name);int count=value instanceof List<?>?((List<?>)value).size():0;rows.add(name+"\t"+count);}
+            Files.write(evidence.resolve("audio-pool.tsv"),rows,StandardCharsets.UTF_8);
+            List<String> pools=new ArrayList<>();
+            for(String poolField:List.of("field_2260","field_2261","field_2262")){
+                Object nativePool=field(manager.getClass(),poolField).get(manager);
+                for(Field f:nativePool.getClass().getDeclaredFields())if(Map.class.isAssignableFrom(f.getType())){f.setAccessible(true);pools.add(poolField+"\t"+((Map<?,?>)f.get(nativePool)).size());}
+            }
+            Files.write(evidence.resolve("audio-all-pools.tsv"),pools,StandardCharsets.UTF_8);
+            Class<?> al=Class.forName("org.lwjgl.openal.AL",false,cl),deviceType=Class.forName("org.lwjgl.openal.ALCdevice",false,cl);
+            Object device=al.getMethod("getDevice").invoke(null);
+            String endpoint=(String)Class.forName("org.lwjgl.openal.ALC10",false,cl).getMethod("alcGetString",deviceType,int.class).invoke(null,device,0x1013);
+            event("native_audio_probe_ready","poolKeys="+entries.size()+";device="+endpoint.replace('\0','|')+";noWorldOpened=true");
+            Files.writeString(evidence.resolve("audio-ready"),"ready\n");audioReadyAt=System.nanoTime();
+        }
+        if(audioStartedAt==0){
+            if(!Files.isRegularFile(evidence.resolve("emit.flag"))){if(System.nanoTime()-audioReadyAt>90_000_000_000L)throw new IllegalStateException("Capture emission gate timeout");return;}
+            audioStartedAt=System.nanoTime();
+        }
+        long elapsed=(System.nanoTime()-audioStartedAt)/1_000_000L;
+        if(audioSoundIndex<sounds.length&&elapsed>=audioSoundIndex*1200L){
+            String name=sounds[audioSoundIndex++];
+            method(manager.getClass(),"method_1710",String.class,float.class,float.class).invoke(manager,name,.25F,1F);
+            event("native_audio_probe_emit","key="+name+";volume=.25;nativeSoundManager=true");
+        }
+        if(!audioMusicStarted&&elapsed>=7200){
+            audioMusicStarted=true;Object settings=field(client.getClass(),"field_3823").get(client);
+            Field music=field(settings.getClass(),"field_960");audioOriginalMusic=music.getFloat(settings);music.setFloat(settings,.25F);
+            field(manager.getClass(),"field_2267").setInt(manager,0);
+            method(manager.getClass(),"method_1717").invoke(manager);
+            event("native_audio_probe_emit","key=music;volume=.25;nativeSoundManager=true;onlyQaCooldownChanged=true");
+        }
+        if(elapsed>=12500){
+            if(audioOriginalMusic>=0){Object settings=field(client.getClass(),"field_3823").get(client);field(settings.getClass(),"field_960").setFloat(settings,audioOriginalMusic);}
+            ended=true;method(client.getClass(),"method_2949").invoke(client);event("native_audio_probe_shutdown","noWorldOpened=true;normalGameShutdown=true");
+        }
     }
 
     private static void verifyReportsNotice(Object client, ClassLoader cl, Object server) throws Exception {

@@ -121,6 +121,31 @@ removed; registry bytes are restored on completion or probe failure.
 
 ## Evidence boundaries
 
+### Reproducing missing legacy sounds
+
+`run_audio_probe.py` runs the marked native fixture at its real title screen,
+without opening worlds or invoking Steam. It coordinates native playback with
+the process-only capture tool; see `python tools/runtime-qa/run_audio_probe.py
+--help`. `--omit-assets-dir` is an explicit negative control reproducing the
+native default asset path. The normal case passes the prepared virtual legacy
+asset folder. This contrast does not validate production CmlLib arguments: the
+launcher must separately test its actual inherited profile argument builder.
+
+The native probe registers six effect requests at 25% volume and then invokes
+native music playback after setting only its independent QA music cooldown to
+zero. It restores the QA music volume before normal shutdown. It does not test
+block physics, natural music timing, hostile mobs, or sounds of a remote player.
+`audio-all-pools.tsv` records effects/stream/music pools. The analyzer compares
+native event timestamps and captured PCM; one-LSB PCM16 quantization dither is
+reported as a noise floor, not a successful sound. Music-only analysis excludes
+the maximum indexed rain duration plus a conservative tail allowance.
+
+On 8 November, the production Java command lacked inherited game arguments and
+read `Instances/Better Than Wolves/assets`, which was absent. The exact indexed
+objects and virtual files were intact. A direct native fixture with explicit
+`--assetsDir` had masked this production-path defect in earlier acceptance.
+Read-only inspection and the negative control now distinguish both paths.
+
 For the final single-difficulty/Creative-command probe, first create an explicit
 offline synthetic identity in the owned fixture:
 

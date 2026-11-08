@@ -1,0 +1,20 @@
+<Project InitialTargets="RequireCaptureBuildRoot">
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(CaptureBuildRoot)/obj/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(CaptureBuildRoot)/obj/</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>$(CaptureBuildRoot)/bin/</BaseOutputPath>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+  <Target Name="RequireCaptureBuildRoot">
+    <Error Condition="'$(CaptureBuildRoot)' == ''" Text="Pass an absolute owned artifacts directory with -p:CaptureBuildRoot=..." />
+  </Target>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>
