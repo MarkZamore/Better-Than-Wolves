@@ -2,6 +2,13 @@
 
 Minecraft Java 1.6.4, Legacy Fabric Loader 0.18.2, Java 17; Better Than Wolves: Community Edition 3.1.1 и Nightmare Mode 1.1.6. Авторские игровые JAR загружены из указанных пользователем официальных Modrinth версий без замен и изменений. Стабильный ID `better-than-wolves`, путь установки `Better Than Wolves`; редактируемое видимое имя находится только в `library/content.json:name`.
 
+Для текущего выпуска обновите лаунчер до **483 или новее**: в нём исправлено
+наследование legacy-аргументов и путь к обычным звуковым ресурсам. Общий e4steam
+`legacy-fabric-164-v4` / V6 исправляет выбранный ник в служебных сообщениях
+команд. Оба участника получают новый транспорт после перезапуска лаунчера.
+Авторские JAR и настройки мира не менялись. Отдельная ошибка загрузки OpenAL на
+ПК гостя остаётся диагностикой, а не объявленным исправлением этого выпуска.
+
 ## Источники и воспроизводимость
 
 Better Than Wolves CE продолжает Better Than Wolves FlowerChild; авторы CE указаны в исходном JAR и на https://modrinth.com/mod/btwce. Nightmare Mode: elmi2305, https://modrinth.com/mod/nightmare-mode-btw. Точные project/version IDs, официальные URL, размеры, SHA256 и официальные SHA512/SHA1 закреплены в `tools/upstream-lock.json`. Дополнительные библиотеки уже вложены авторами; скрытых обновлений или замен нет.
@@ -49,7 +56,7 @@ python -B tools/update_upstream.py --pack . --upstream-lock artifacts/reviewed-n
 
 ## Публикация
 
-Workflow восстанавливает и проверяет закреплённую поставку, запускает Python tests и сначала полностью скачивает публичный совместимый лаунчер `latest` (релиз не ниже 445), `update.json` и все объявленные EXE/delta assets. Проверяются реальные byte counts, SHA256 и GitHub server digests, а также неизменность public snapshot во время загрузки. Новые версии выше 445 принимаются; сама поддержка функций по-прежнему определяется тремя capabilities манифеста, а не одним номером. Этот отчёт проверяет доставку, не заменяет Defender или runtime acceptance.
+Workflow восстанавливает и проверяет закреплённую поставку, запускает Python tests и сначала полностью скачивает публичный совместимый лаунчер `latest` (для текущего выпуска не ниже 483), `update.json` и все объявленные EXE/delta assets. Проверяются реальные byte counts, SHA256 и GitHub server digests, а также неизменность public snapshot во время загрузки. Три capabilities манифеста определяют API платформы; отдельная проверка публичного релиза гарантирует наличие исправления legacy-аргументов. Этот отчёт проверяет доставку, не заменяет Defender или runtime acceptance.
 
 Затем публикуются content-addressed payload перед authoritative `pack-manifest.json` в rolling release `pack-latest`. После публикации отдельный процесс на чистом GitHub runner заново скачивает **все** публичные assets сборки и проверяет revision, hashes, archive members и библиотеку. Это настоящий повторный public download на runner; проверка API digest без полного тела не выдаётся за него. На медленном локальном соединении такой результат не называется локальным повторным скачиванием.
 
