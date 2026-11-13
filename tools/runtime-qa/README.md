@@ -192,6 +192,18 @@ attempt claiming the host alias must be rejected without adding a player.
 Listener closure, publication-task cleanup and the stopped Steam session are
 checked after native quit. None of these is a two-account Steam P2P verdict.
 
+The Survival command probe accepts `--property btw.qa.survivalCommands=true`
+or `false` with the same synthetic host identity and Russian locale. Create
+separate worlds with `--mode fresh`, then run `--mode reenter` for each. The
+fresh run seeds the disposable world's native flag and the reentry run checks
+the saved value. The real pause action opens the loopback listener and prints
+its native chat feedback. The server executes `time set day` as its actual
+host and as a synthetic server-player object with an empty OP list. The
+probe intercepts feedback for that dispatch and disables Steam bootstrap.
+`native_survival_command_mismatch` is a failed permission check even if the
+client saves and exits successfully. The synthetic guest exercises the native
+permission check without logging in.
+
 Rendered pixels/counters are native technical evidence. A screenshot or
 human visual verdict, positive arbitrary-author cape behavior, and actual
 two-account friendship/discovery/P2P remain separate checks.

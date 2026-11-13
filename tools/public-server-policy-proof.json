@@ -1,12 +1,14 @@
 {
-  "repository": "Better-Than-Wolves",
-  "revision": "d65a7f7f7abb9e3e8c828f728e3e033d8e207aed",
   "status": "PASS",
   "policy": "steam-only-automatic-server-list-v1",
-  "reviewedInventorySha256": "f5cccb02112d3740635014db65d54946c088190f7b5d0210c090e499e9f2c225",
+  "reviewedInventorySha256": "c7cfc5b0ec4105293dde6509812244bdd282896598a5b02240f6b01d84dc4e87",
   "files": 7,
   "textFilesChecked": 3,
   "personalServerListsModified": false,
-  "checks": "Five common regression tests passed; full reviewed text inventory checked against published SHA; no new gameplay run.",
-  "payloadChanges": []
+  "repository": "Better-Than-Wolves",
+  "revision": "staging",
+  "checks": "Only the existing bridge Share argument selector changed. The new code reads WorldInfo and supplies the existing native command flag. No new server-list hooks or payload seed files.",
+  "payloadChanges": [
+    "Rebuilt btw-lan-bridge-1.0.0.jar to honor saved Survival command settings."
+  ]
 }

@@ -37,20 +37,24 @@ public final class RegistryDataTest {
         var ambiguous = RegistryData.identities(List.of(identity, identity.replace("UGxheWVyT25l", "Tm90Y2g=")));
         check(ambiguous.isEmpty(), "conflicting labels for one canonical identity are rejected");
         check(RegistryData.namedEffectName(labels, name, "Dinnerbone", false).equals("Dinnerbone"), "named mob native effect is unchanged");
-        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> Mode.CREATIVE).mode() == Mode.CREATIVE,
+        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> new LanGuestMode.Share(Mode.CREATIVE, false)).mode() == Mode.CREATIVE,
             "Creative worlds give LAN guests Creative");
-        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> Mode.SURVIVAL).mode() == Mode.SURVIVAL,
+        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> new LanGuestMode.Share(Mode.SURVIVAL, false)).mode() == Mode.SURVIVAL,
             "Survival worlds keep the native Survival default");
-        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> Mode.ADVENTURE).mode() == Mode.SURVIVAL,
+        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> new LanGuestMode.Share(Mode.ADVENTURE, false)).mode() == Mode.SURVIVAL,
             "Adventure worlds keep the native Survival default");
         check(LanGuestMode.select(Mode.SURVIVAL, false, () -> null).mode() == Mode.SURVIVAL,
             "Unavailable world retains the native default");
         check(LanGuestMode.select(Mode.ADVENTURE, false, () -> { throw new AssertionError("Explicit mode must win"); }).mode()
             == Mode.ADVENTURE, "Explicit LAN mode is respected");
-        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> Mode.CREATIVE).commandsAllowed(),
+        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> new LanGuestMode.Share(Mode.CREATIVE, false)).commandsAllowed(),
             "Creative guests receive commands by user decision");
-        check(!LanGuestMode.select(Mode.SURVIVAL, false, () -> Mode.SURVIVAL).commandsAllowed(),
-            "Survival guests keep the authored command restriction");
+        check(!LanGuestMode.select(Mode.SURVIVAL, false, () -> new LanGuestMode.Share(Mode.SURVIVAL, false)).commandsAllowed(),
+            "Survival guests are denied commands when the world disables them");
+        check(LanGuestMode.select(Mode.SURVIVAL, false, () -> new LanGuestMode.Share(Mode.SURVIVAL, true)).commandsAllowed(),
+            "Survival guests inherit the saved world permission when Share defaults to false");
+        check(!LanGuestMode.select(Mode.SURVIVAL, true, () -> new LanGuestMode.Share(Mode.SURVIVAL, false)).commandsAllowed(),
+            "The saved Survival restriction overrides a stale share flag");
         System.out.println("RegistryDataTest: " + assertions + " checks passed");
     }
     private enum Mode { SURVIVAL, CREATIVE, ADVENTURE }

@@ -14,6 +14,8 @@ public final class BtwQaAgent implements ClassFileTransformer {
     private static String world, mode;
     private static java.awt.Frame hiddenParent;
     private static boolean lanModeProbe, lanModeObserved;
+    private static boolean survivalCommandsProbe;
+    private static boolean survivalCommandsAllowed;
     private static int lanProbeCalls;
     private static String lanProbeMode;
     private static boolean lanProbeCommands;
@@ -65,7 +67,13 @@ public final class BtwQaAgent implements ClassFileTransformer {
         world=required("world");mode=required("mode");
         if(!world.matches("BtwQa[A-Za-z0-9_-]{0,40}") || !(mode.equals("fresh")||mode.equals("reenter")))throw new SecurityException("Invalid native action");
         lanModeProbe = Boolean.getBoolean("btw.qa.lanGuestMode");
-        if (lanModeProbe && Boolean.getBoolean("btw.qa.publish"))
+        String survivalCommands = System.getProperty("btw.qa.survivalCommands", "");
+        survivalCommandsProbe = !survivalCommands.isEmpty();
+        if (survivalCommandsProbe && !Set.of("true", "false").contains(survivalCommands))
+            throw new IllegalArgumentException("Expected true or false for the Survival commands probe");
+        survivalCommandsAllowed = Boolean.parseBoolean(survivalCommands);
+        if ((lanModeProbe || survivalCommandsProbe) && Boolean.getBoolean("btw.qa.publish")
+                || lanModeProbe && survivalCommandsProbe)
             throw new SecurityException("Guest mode probe requires isolated publication");
         Path save=game.resolve("saves").resolve(world);
         if(mode.equals("fresh")&&Files.exists(save))throw new SecurityException("Fresh world exists");
@@ -81,8 +89,8 @@ public final class BtwQaAgent implements ClassFileTransformer {
         boolean font=name.equals("net/minecraft/class_370");
         boolean living=name.equals("net/minecraft/class_1635");
         boolean isolatedShare = lanModeProbe && name.equals("net/minecraft/class_601");
-        boolean isolatedSteam = lanModeProbe && name.equals("link/e4steam/retro/RetroBootstrap");
-        boolean observeChat = lanModeProbe && name.equals("net/minecraft/class_357");
+        boolean isolatedSteam = (lanModeProbe || survivalCommandsProbe) && name.equals("link/e4steam/retro/RetroBootstrap");
+        boolean observeChat = (lanModeProbe || survivalCommandsProbe) && name.equals("net/minecraft/class_357");
         if(!name.equals("net/minecraft/class_1600")&&!render&&!server&&!font&&!living
                 &&!isolatedShare&&!isolatedSteam&&!observeChat&&!hiddenDisplay)return null;
         try {
@@ -297,6 +305,11 @@ public final class BtwQaAgent implements ClassFileTransformer {
                     verifyNativeAudio(client, cl);
                     lanModeObserved = true;
                 }
+                if (survivalCommandsProbe && !progressQueued && worldTicks >= 80) {
+                    openSurvivalWorld(client, cl);
+                    progressQueued = true;
+                    SERVER_ACTIONS.add(BtwQaAgent::checkSurvivalCommands);
+                }
                 if(!skinObserved && worldTicks>=60 && !System.getProperty("minecraft.portable.skin.registry","").isBlank()) {
                     String nativeName=(String)field(player.getClass(),"field_3982").get(player);
                     Class<?> profiles=Class.forName("api.client.mojapi.ProfileUtils",true,cl);
@@ -361,6 +374,7 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 if(progressFailure!=null)throw new IllegalStateException("Native server progress probe failed",progressFailure);
                 if(Boolean.getBoolean("btw.qa.nameMechanics")&&worldTicks>=170)nameMechanics(client,player,cl);
                 if(worldTicks<200 || leaving)return;
+                if(survivalCommandsProbe && !progressDone)return;
                 if(Boolean.getBoolean("btw.qa.nameMechanics")&&!nameMechanicsDone){if(worldTicks>1600)throw new IllegalStateException("Native name mechanics probe did not finish");return;}
                 if(!progress.isBlank()&&!progressDone){if(worldTicks>800)throw new IllegalStateException("Native server task did not complete");return;}
                 if(!System.getProperty("minecraft.portable.skin.registry","").isBlank()&&!skinObserved) {
@@ -407,6 +421,62 @@ public final class BtwQaAgent implements ClassFileTransformer {
                 event("native_shutdown_requested","normalGameShutdown=true");
             }
         } catch(Throwable t){failure(t);} finally {Thread.currentThread().setContextClassLoader(before);busy=false;}
+    }
+
+    private static void openSurvivalWorld(Object client, ClassLoader loader) throws Exception {
+        Object server = method(client.getClass(), "method_2909").invoke(client);
+        if (mode.equals("fresh")) {
+            Object overworld = method(server.getClass(), "method_2991", int.class).invoke(server, 0);
+            Object info = method(overworld.getClass(), "method_3588").invoke(overworld);
+            // Seed the disposable world's persisted setting because author UI can force its default.
+            field(info.getClass(), "field_252").setBoolean(info, survivalCommandsAllowed);
+        }
+        Object pause = Class.forName("net.minecraft.class_385", true, loader).getConstructor().newInstance();
+        Class<?> screen = Class.forName("net.minecraft.class_388", false, loader);
+        method(client.getClass(), "method_2928", screen).invoke(client, pause);
+        lanProbeChat = null;
+        click(pause, 7, true);
+        if (!(Boolean) method(server.getClass(), "method_1638").invoke(server)
+                || lanProbeChat == null
+                || !lanProbeChat.replaceAll("§[0-9a-fk-or]", "").matches("Порт локального сервера: [0-9]+"))
+            throw new IllegalStateException("Native pause publication or its chat feedback failed: " + lanProbeChat);
+        event("native_survival_share", "listenerOpened=true;nativeChat=true;steamBootstrapSuppressed=true");
+    }
+
+    private static void checkSurvivalCommands(Object server) throws Exception {
+        ClassLoader loader = server.getClass().getClassLoader();
+        Object overworld = method(server.getClass(), "method_2991", int.class).invoke(server, 0);
+        Object info = method(overworld.getClass(), "method_3588").invoke(overworld);
+        if (!((Enum<?>) method(info.getClass(), "method_233").invoke(info)).name().equals("SURVIVAL")
+                || (Boolean) method(info.getClass(), "method_237").invoke(info) != survivalCommandsAllowed)
+            throw new IllegalStateException("Native Survival world settings differ from the fixture");
+        Object manager = method(server.getClass(), "method_3004").invoke(server);
+        if (!((Set<?>) field(manager.getClass(), "field_2715").get(manager)).isEmpty())
+            throw new IllegalStateException("Command probe requires an empty OP list");
+        List<?> players = (List<?>) field(manager.getClass(), "field_2708").get(manager);
+        if (players.size() != 1) throw new IllegalStateException("Command probe requires one native host");
+        Class<?> interaction = Class.forName("net.minecraft.class_799", true, loader);
+        Class<?> gameWorld = Class.forName("net.minecraft.class_1150", true, loader);
+        Class<?> serverType = Class.forName("net.minecraft.server.MinecraftServer", true, loader);
+        Class<?> player = Class.forName("net.minecraft.class_798", true, loader);
+        Constructor<?> createGuest = player.getConstructor(serverType, gameWorld, String.class, interaction);
+        int host = runTimeCommand(server, players.get(0));
+        int guest = runTimeCommand(server, createGuest.newInstance(server, overworld, "QaGuest",
+            interaction.getConstructor(gameWorld).newInstance(overworld)));
+        event("native_survival_commands", "worldCommands=" + survivalCommandsAllowed
+            + ";host=" + host + ";guest=" + guest + ";guestFixture=true;opListEmpty=true");
+        // The baseline intentionally records a mismatch without preventing save and clean shutdown.
+        if (host != (survivalCommandsAllowed ? 1 : 0) || guest != host)
+            event("native_survival_command_mismatch", "host=" + host + ";guest=" + guest);
+    }
+
+    private static int runTimeCommand(Object server, Object player) throws Exception {
+        Class<?> sender = Class.forName("net.minecraft.class_1061", true, server.getClass().getClassLoader());
+        Object feedback = Proxy.newProxyInstance(sender.getClassLoader(), new Class<?>[]{sender},
+            (proxy, called, args) -> called.getName().equals("method_5505") ? null : called.invoke(player, args));
+        Object dispatcher = method(server.getClass(), "method_2971").invoke(server);
+        return (Integer) method(dispatcher.getClass(), "method_3310", sender, String.class)
+            .invoke(dispatcher, feedback, "time set day");
     }
 
     private static void verifyGuestMode(Object client, ClassLoader cl) throws Exception {

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packId": "better-than-wolves",
-  "purpose": "Preserve the reviewed runtime descriptor, explicit config ownership, controls preset and identity/skin/title bridge and reviewed Nightmare/Creative world policy across upstream preparation.",
+  "purpose": "Preserve the reviewed runtime descriptor, explicit config ownership, controls preset and identity/skin/title bridge and reviewed Nightmare and LAN world settings across upstream preparation.",
   "reviewedBaseFiles": [
     {
       "path": "mods/btwce-3.1.1.jar",
@@ -35,8 +35,8 @@
     "path": "mods/btw-lan-bridge-1.0.0.jar",
     "modId": "btw_lan_bridge",
     "builder": "tools/legacy-bridge/build_bridge.py",
-    "sizeBytes": 25200,
-    "sha256": "04e3441753b061d6e426ef117fe50ccd8f07892740b04fd1a397b98de72e06e2",
+    "sizeBytes": 25353,
+    "sha256": "59e90f91412f3ade2afed296f75d25734585ba1d3532c58ae5fb30e3e3268162",
     "recipeFiles": [
       {
         "path": "tools/legacy-bridge/.gitignore",
@@ -50,8 +50,8 @@
       },
       {
         "path": "tools/legacy-bridge/README.md",
-        "sizeBytes": 7476,
-        "sha256": "95765f00439d138aa111b8df708be8c4d2a374b2cd7757c98e52555946e20c1c"
+        "sizeBytes": 7485,
+        "sha256": "2bc6129041e5c519a066aceae89e2be14dcb8b892a90dca0ae222ea1d9f31f01"
       },
       {
         "path": "tools/legacy-bridge/build_bridge.py",
@@ -65,8 +65,8 @@
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/LanGuestMode.java",
-        "sizeBytes": 2088,
-        "sha256": "17fce046d4a76c0fc5a8de6902f4301e2e4ac1b5b7db82f457078cade8ee6fcf"
+        "sizeBytes": 2397,
+        "sha256": "cbdb25f1e24e3440e0fe55bfc06ebb6e2f1dbcba22a8cdc51da220de9dfb8d91"
       },
       {
         "path": "tools/legacy-bridge/src/main/java/org/lanminecraft/btwbridge/RegistryData.java",
@@ -140,8 +140,8 @@
       },
       {
         "path": "tools/legacy-bridge/src/test/java/org/lanminecraft/btwbridge/RegistryDataTest.java",
-        "sizeBytes": 5467,
-        "sha256": "0ae31ea46dfaca8c2333b07f8d6379ba7eb6bc43551f5141c40e9ad5c2d6fd04"
+        "sizeBytes": 6058,
+        "sha256": "60df894b9e7500bb3041be28e19e0807ae30d118b9a2b140e8c5944b7c82b9ea"
       }
     ],
     "status": "reviewed-final"

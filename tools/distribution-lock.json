@@ -25,8 +25,8 @@
     },
     {
       "path": "mods/btw-lan-bridge-1.0.0.jar",
-      "sizeBytes": 25200,
-      "sha256": "04e3441753b061d6e426ef117fe50ccd8f07892740b04fd1a397b98de72e06e2"
+      "sizeBytes": 25353,
+      "sha256": "59e90f91412f3ade2afed296f75d25734585ba1d3532c58ae5fb30e3e3268162"
     },
     {
       "path": "mods/btwce-3.1.1.jar",
@@ -47,8 +47,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sizeBytes": 5517,
-      "sha256": "5ca169a451934c93b6ac7a2387b98e928fa9084464347adaeb4ca4b0481a5b4b"
+      "sizeBytes": 6039,
+      "sha256": "3b99737cbdbc095237a158d695aad9e680e4a29385c7605b6c075e467e7a2445"
     },
     {
       "path": "library/README.md",
@@ -63,7 +63,7 @@
     {
       "path": "library/loaded-mods.json",
       "sizeBytes": 2470,
-      "sha256": "c5cd4ce127dd4b4ab335949bea02e4c350a7d6ae9fdb1967db90bf4f00c9dbc6"
+      "sha256": "2bced7dfcc358410b5bad92a7c78b0638348fdd68ec8c2304484e5e6cbc084ec"
     },
     {
       "path": "library/mod-pages.json",
@@ -82,13 +82,13 @@
     },
     {
       "path": "tools/public-server-policy-proof.json",
-      "sizeBytes": 503,
-      "sha256": "2993da84c4624c84b82b91bfad0ad270626bfff485012fe6c8914fb12b2ee653"
+      "sizeBytes": 618,
+      "sha256": "837f2c5560626d06d5f66a56a79dd4d4ef6db766d14d4487701bddfab6faab9b"
     },
     {
       "path": "tools/public-server-policy.json",
-      "sizeBytes": 818,
-      "sha256": "acca22934ad792ef01d72f1d2048fd2111700eaeaf8e15e64d89a935675716fd"
+      "sizeBytes": 785,
+      "sha256": "533112262d2e9b27cdf0286a04b2ddb6b81ff0bb68a94d614c6e5cdbee6760dd"
     },
     {
       "path": "tools/public_server_policy.py",
